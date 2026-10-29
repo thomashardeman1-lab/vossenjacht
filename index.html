@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>De Digitale Vossenjacht • MSK Gent</title>
+  <title>De Vossenjacht</title>
+  <meta name="theme-color" content="#0c120e">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -12,7 +13,19 @@
 <body>
   <div id="app"></div>
 
+  <!-- het nachtelijke bos achter alle schermen -->
+  <div class="bos" aria-hidden="true">
+    <div class="maan"></div>
+    <svg class="bomen ver" viewBox="0 0 1000 300" preserveAspectRatio="none"><path d="M0 300 L0 260 L0 270 L34 105 L67 270 L50.25 270 L89 164 L127.25 270 L108.0 270 L144 103 L179.0 270 L161.25 270 L199 100 L236.25 270 L217.5 270 L256 172 L295.5 270 L276.0 270 L316 179 L355.0 270 L335.25 270 L373 147 L410.25 270 L391.5 270 L430 151 L468.5 270 L449.25 270 L482 89 L515.25 270 L498.75 270 L536 111 L573.75 270 L555.0 270 L594 120 L632.0 270 L612.75 270 L649 99 L684.75 270 L666.75 270 L699 151 L730.75 270 L714.75 270 L755 161 L794.75 270 L774.75 270 L813 131 L850.75 270 L831.75 270 L862 95 L891.75 270 L876.75 270 L908 160 L938.75 270 L923.25 270 L962 175 L1001.25 270 L981.75 270 L1016 81 L1050.75 270 L1000 300 Z" fill="#16251c"/></svg>
+    <div class="mist twee"></div>
+    <svg class="bomen" viewBox="0 0 1000 300" preserveAspectRatio="none"><path d="M0 300 L0 260 L0 270 L45 191 L90 270 L67.5 270 L114 127 L159.5 270 L136.5 270 L177 201 L217.5 270 L197.25 270 L246 198 L294.25 270 L270.0 270 L316 136 L361.0 270 L338.25 270 L379 146 L419.25 270 L399.0 270 L442 206 L485.0 270 L463.5 270 L504 155 L545.5 270 L525.0 270 L572 202 L618.0 270 L594.75 270 L638 199 L681.75 270 L660.0 270 L708 156 L757.0 270 L732.75 270 L773 138 L813.75 270 L793.5 270 L835 182 L876.5 270 L855.75 270 L906 130 L955.75 270 L930.75 270 L980 203 L1028.75 270 L1000 300 Z" fill="#0a110c"/></svg>
+    <div class="mist een"></div>
+    <span class="vuurvlieg"></span><span class="vuurvlieg"></span><span class="vuurvlieg"></span><span class="vuurvlieg"></span>
+    <span class="vuurvlieg"></span><span class="vuurvlieg"></span><span class="vuurvlieg"></span><span class="vuurvlieg"></span>
+  </div>
+
   <script src="js/data.js"></script>
+  <script src="js/geluid.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

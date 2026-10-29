@@ -1,39 +1,49 @@
 /*
- * De Digitale Vossenjacht — spellogica
+ * De Vossenjacht — spellogica
  *
  * Elke iPad opent de pagina met zijn rol in de URL:
  *   index.html?rol=vos     (kijkt naar kant 3)
  *   index.html?rol=jager   (kijkt naar kant 1)
  * Zonder ?rol= kies je de rol op het scherm.
  *
+ * Verloop: start → jachthoorn → aftellen → 5 sporen (links/midden/rechts)
+ * → draai je om → laatste spoor op de grote muur → winst of verlies.
+ * Na elk tweede spoor stuur je een streek naar de overkant:
+ * de Vos stuurt mist, de Jager laat de honden blaffen.
+ * De winnaar krijgt de opdracht de NFC-penning te nemen. De vossenjacht
+ * zelf wordt nooit op het scherm getoond.
+ *
  * Synchronisatie: in dit prototype praten de twee schermen via
- * BroadcastChannel. Dat werkt tussen tabbladen/iframes in dezelfde browser
- * (zie duo.html om op één computer te testen). Voor twee echte iPads
- * vervang je enkel de functie `verbind()` door een realtime dienst
- * (bv. Firebase, Supabase Realtime of een kleine WebSocket-server).
+ * BroadcastChannel (werkt tussen tabbladen of in duo.html). Voor twee echte
+ * iPads vervang je enkel de functie `verbind()` door een realtime dienst.
  */
 (() => {
   'use strict';
 
   const D = window.MSK;
+  const G = window.Geluid;
   const app = document.getElementById('app');
   const params = new URLSearchParams(location.search);
 
-  const STRAF_MS = 3000;          // wachttijd na een fout antwoord
-  const INACTIEF_MS = 120000;     // terug naar start bij inactiviteit
+  const STRAF_MS = 3000;
+  const STREEK_MS = 3000;
+  const INACTIEF_MS = 120000;
   const RESET_NA_EINDE_MS = 45000;
+  const PLAATSEN = [
+    { waarde: 'links', label: 'Links', pijl: '←' },
+    { waarde: 'midden', label: 'Midden', pijl: '↑' },
+    { waarde: 'rechts', label: 'Rechts', pijl: '→' }
+  ];
 
-  const beeld = (id, w = 900) =>
-    id ? `https://imagehub.mskgent.be/iiif/2/public%2F${id}.tif/full/${w},/0/default.jpg` : '';
   const ander = rol => (rol === 'vos' ? 'jager' : 'vos');
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const schud = a => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
+  const trek = (lijst, n) => lijst.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).slice(0, n).map(v => v[1]);
+  const streekIcoon = rol => (rol === 'vos' ? '🌫️' : '🐕');
 
   /* ---------- verbinding tussen de twee schermen ---------- */
-  let kanaal = null;
   function verbind(onBericht) {
     if (!('BroadcastChannel' in window)) return () => {};
-    kanaal = new BroadcastChannel('msk-vossenjacht');
+    const kanaal = new BroadcastChannel('msk-vossenjacht');
     kanaal.onmessage = e => onBericht(e.data);
     return bericht => kanaal.postMessage(bericht);
   }
@@ -53,27 +63,28 @@
       partnerKlaar: false,
       partnerAanwezig: S ? S.partnerAanwezig : false,
       solo: false,
-      vragen: rol ? D.vragen[rol] : [],
+      sporen: rol ? trek(D.sporen[rol], D.aantalSporen) : [],
       i: 0,
       voortgang: { vos: 0, jager: 0 },
       straf: false,
-      opties: null,
+      streek: -1,
       einde: null
     };
   }
 
   function reset(rol = S && S.rol, meld = false) {
     stopTimers();
+    G.stopHartslag();
     S = nieuweToestand(rol);
     if (meld) zend({ type: 'reset' });
     if (rol) zend({ type: 'hallo', rol });
     toon();
+    G.startSfeer();
   }
 
   /* ---------- berichten van het andere scherm ---------- */
   function ontvang(m) {
-    if (!S || !S.rol) return;
-    if (m.rol === S.rol) return; // zelfde rol: negeren
+    if (!S || !S.rol || m.rol === S.rol) return;
     switch (m.type) {
       case 'hallo':
         S.partnerAanwezig = true;
@@ -88,8 +99,14 @@
         break;
       case 'voortgang':
         S.voortgang[m.rol] = m.n;
-        updateRace();
-        if (m.n === S.vragen.length && S.scherm !== 'einde') melding(`${D.rollen[m.rol].naam} draait zich al naar de bovenmuur!`);
+        updateSpoor();
+        if (m.n === D.aantalSporen && !['einde', 'start', 'kies'].includes(S.scherm)) {
+          melding(`${D.rollen[m.rol].naam} is al bij het laatste spoor!`);
+          G.startHartslag();
+        }
+        break;
+      case 'streek':
+        if (['vraag', 'gevonden', 'draai'].includes(S.scherm)) ondergaStreek(m.rol);
         break;
       case 'winst':
         if (S.scherm !== 'einde') einde(m.rol);
@@ -100,38 +117,53 @@
     }
   }
 
-  /* ---------- schermen ---------- */
+  /* ---------- bouwstenen ---------- */
   function toon() {
     const f = {
-      kies: schermKies, start: schermStart, aftellen: schermAftellen,
+      kies: schermKies, start: schermStart, hoorn: schermHoorn, aftellen: schermAftellen,
       vraag: schermVraag, gevonden: schermGevonden, draai: schermDraai, einde: schermEinde
     }[S.scherm];
     app.innerHTML = f();
     app.dataset.rol = S.rol || '';
+    app.dataset.scherm = S.scherm;
     const scherm = app.firstElementChild;
-    if (scherm) scherm.classList.add('in');
+    if (scherm) requestAnimationFrame(() => scherm.classList.add('in'));
   }
 
-  const kop = () => `
-    <header class="kop">
-      <div class="merk"><span class="msk">MSK</span><span class="streep"></span><span class="sub">Museum voor Schone Kunsten Gent</span></div>
-      ${S.rol ? `<div class="rolbadge" style="--k:${D.rollen[S.rol].kleur}">${D.rollen[S.rol].icoon} ${D.rollen[S.rol].naam}</div>` : '<div class="label">Interactieve installatie</div>'}
-    </header>`;
+  const rolBadge = rol => `<span class="rolbadge" style="--k:${D.rollen[rol].kleur}">${D.rollen[rol].icoon} ${D.rollen[rol].naam}</span>`;
 
+  const spoor = () => {
+    const n = D.aantalSporen + 1;
+    const rij = rol => `<div class="pootrij ${rol === S.rol ? 'eigen' : ''}" style="--k:${D.rollen[rol].kleur}">
+        <span class="wie">${D.rollen[rol].icoon}</span>
+        ${Array.from({ length: n }, (_, k) => `<i class="${k < S.voortgang[rol] ? 'gezet' : ''} ${k === n - 1 ? 'laatste' : ''}">${k === n - 1 ? '★' : '🐾'}</i>`).join('')}
+      </div>`;
+    return `<div class="spoor">${rij(S.rol)}${S.solo ? '' : rij(ander(S.rol))}</div>`;
+  };
+
+  function updateSpoor() {
+    const el = app.querySelector('.spoor');
+    if (el) el.outerHTML = spoor();
+  }
+
+  const kop = () => `<header class="kop">${spoor()}${rolBadge(S.rol)}</header>`;
+  const streekNu = () => !S.solo && S.i % 2 === 0 && S.i < D.aantalSporen;
+
+  /* ---------- schermen ---------- */
   function schermKies() {
-    return `<section class="scherm kies">${kop()}
-      <main class="midden">
-        <h1 class="titel">De Digitale <em>Vossenjacht</em></h1>
-        <p class="lead">Welke kant van de sokkel is dit scherm?</p>
-        <div class="rolkeuze">
-          ${['vos', 'jager'].map(r => `
-            <button class="rolkaart" data-act="kies" data-rol="${r}" style="--k:${D.rollen[r].kleur}">
-              <span class="groot">${D.rollen[r].icoon}</span>
-              <strong>${D.rollen[r].naam}</strong>
-              <small>kijkt naar ${D.rollen[r].muurNaam}</small>
-            </button>`).join('')}
-        </div>
-      </main></section>`;
+    return `<section class="scherm midden kies">
+      <p class="bovenschrift">Een jacht voor twee</p>
+      <h1 class="titel">De <em>Vossenjacht</em></h1>
+      <p class="lead">Welke kant van de sokkel is dit scherm?</p>
+      <div class="rolkeuze">
+        ${['vos', 'jager'].map(r => `
+          <button class="rolkaart" data-act="kies" data-rol="${r}" style="--k:${D.rollen[r].kleur}">
+            <span class="groot">${D.rollen[r].icoon}</span>
+            <strong>${D.rollen[r].naam}</strong>
+            <small>kijkt naar ${D.rollen[r].muurNaam}</small>
+          </button>`).join('')}
+      </div>
+    </section>`;
   }
 
   function schermStart() {
@@ -139,151 +171,151 @@
     let status;
     if (S.klaar && !S.partnerKlaar) status = `Wachten tot ${tegen.naam.toLowerCase()} klaar is…`;
     else if (!S.klaar && S.partnerKlaar) status = `${tegen.naam} staat klaar. Jij ook?`;
-    else status = S.partnerAanwezig ? `${tegen.naam} is verbonden.` : `Zoek je tegenspeler aan de overkant van de sokkel.`;
+    else status = S.partnerAanwezig ? `${tegen.naam} staat aan de overkant.` : 'Zoek je tegenspeler aan de overkant van de sokkel.';
 
-    return `<section class="scherm start">${kop()}
-      <main class="midden uitleg">
-        <div class="pil">Spel voor 2 spelers</div>
-        <h1 class="titel">De Digitale <em>Vossenjacht</em></h1>
-        <p class="lead">Jij bent <strong style="color:${r.kleur}">${r.naam.toLowerCase()}</strong>. ${esc(r.intro)}</p>
-        <ol class="regels">
-          <li>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
-          <li>Los ${S.vragen.length} sporen op. Een fout antwoord kost je ${STRAF_MS / 1000} seconden.</li>
-          <li>Wie eerst klaar is, draait zich naar de grote muur voor het laatste spoor.</li>
-          <li>Wie dat als eerste vindt, wint de penning.</li>
-        </ol>
-        <button class="knop goud" data-act="klaar" ${S.klaar ? 'disabled' : ''}>${S.klaar ? 'Klaar ✓' : 'Ik ben klaar'}</button>
-        <p class="status">${status}</p>
-        <button class="link" data-act="solo">Oefenen zonder tegenspeler</button>
-      </main></section>`;
-  }
-
-  function schermAftellen() {
-    return `<section class="scherm aftellen"><div class="teller" id="teller">3</div><p class="lead">De jacht begint…</p></section>`;
-  }
-
-  const race = () => {
-    const tot = S.vragen.length + 1;
-    const baan = rol => {
-      const r = D.rollen[rol];
-      const p = Math.min(S.voortgang[rol], tot) / tot * 100;
-      return `<div class="baan ${rol === S.rol ? 'eigen' : ''}" data-baan="${rol}">
-        <span class="naam">${rol === S.rol ? 'Jij' : r.naam}</span>
-        <div class="spoor"><div class="vul" style="width:${p}%;background:${r.kleur}"></div><span class="loper" style="left:${p}%">${r.icoon}</span></div>
-      </div>`;
-    };
-    return `<div class="race">${baan(S.rol)}${S.solo ? '' : baan(ander(S.rol))}</div>`;
-  };
-
-  function updateRace() {
-    const el = app.querySelector('.race');
-    if (el) el.outerHTML = race();
-  }
-
-  function huidigeVraag() {
-    return S.i < S.vragen.length ? S.vragen[S.i] : D.finale;
-  }
-
-  // Drie grote knoppen: links, midden en rechts op de muur achter je tegenspeler.
-  function muurSchets() {
-    const r = D.rollen[S.rol];
-    const plaatsen = ['Links', 'Midden', 'Rechts'];
-    const pijlen = ['←', '↑', '→'];
-    return `<div class="muurknoppen">
-      ${r.muur.map((k, n) => `<button class="plaats" data-act="muur" data-werk="${k}">
-        <span class="pijltje">${pijlen[n]}</span><span>${plaatsen[n]}</span></button>`).join('')}
-    </div>
-    <p class="hint">Welk schilderij op de muur achter je tegenspeler?</p>`;
-  }
-
-  function schermVraag() {
-    const q = huidigeVraag();
-    const finale = S.i >= S.vragen.length;
-    if (q.type === 'keuze' && !S.opties) S.opties = schud(q.opties);
-    const nr = finale ? 'Laatste spoor' : `Spoor ${S.i + 1} van ${S.vragen.length}`;
-    return `<section class="scherm vraag ${finale ? 'finale' : ''}">${kop()}
-      ${race()}
-      <main class="kaart">
-        <div class="nummer">${nr}</div>
-        <h2 class="vraagtekst">${esc(q.tekst)}</h2>
-        ${q.type === 'muur' ? muurSchets(q) : `<div class="opties">${S.opties.map(o =>
-          `<button class="optie" data-act="keuze" data-waarde="${esc(o)}">${esc(o)}</button>`).join('')}</div>`}
-      </main>
-      <div class="straf ${S.straf ? 'aan' : ''}" id="straf"><div><strong>Mis!</strong><p>Kijk nog eens goed naar de muur.</p><div class="balk"><span></span></div></div></div>
+    return `<section class="scherm midden start">
+      <div class="rolicoon" style="--k:${r.kleur}">${r.icoon}</div>
+      <p class="bovenschrift">Jij bent ${r.naam.toLowerCase()}</p>
+      <h1 class="titel">De <em>Vossenjacht</em></h1>
+      <p class="lead">${esc(r.intro)}</p>
+      <ol class="regels">
+        <li><span>🐾</span>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
+        <li><span>🔎</span>Volg ${D.aantalSporen} sporen. Een fout spoor kost je ${STRAF_MS / 1000} tellen.</li>
+        <li><span>${streekIcoon(S.rol)}</span>Elke twee sporen lever je je tegenspeler een streek.</li>
+        <li><span>★</span>Wie het laatste spoor eerst vindt, wint de penning.</li>
+      </ol>
+      <button class="knop goud" data-act="klaar" ${S.klaar ? 'disabled' : ''}>${S.klaar ? 'Klaar ✓' : 'Ik ben klaar'}</button>
+      <p class="status">${status}</p>
+      <button class="link" data-act="solo">Alleen oefenen</button>
     </section>`;
   }
 
-  // Kort bevestigingsscherm na een juist antwoord; het spel gaat vanzelf verder.
+  function schermHoorn() {
+    return `<section class="scherm midden hoorn">
+      <div class="hoorn-icoon">📯</div>
+      <h1 class="titel">De jacht <em>begint</em></h1>
+    </section>`;
+  }
+
+  function schermAftellen() {
+    return `<section class="scherm midden aftellen"><div class="teller pop" id="teller">3</div></section>`;
+  }
+
+  const huidig = () => (S.i < S.sporen.length ? S.sporen[S.i] : null);
+
+  function schermVraag() {
+    const q = huidig();
+    const finale = !q;
+    const tekst = finale ? D.finale.tekst : q.tekst;
+    const knoppen = finale ? D.finale.opties : PLAATSEN;
+    return `<section class="scherm vraag ${finale ? 'finale' : ''}">${kop()}
+      <main class="blad">
+        <p class="bovenschrift">${finale ? '★ Het laatste spoor' : `Spoor ${S.i + 1} van ${D.aantalSporen}`}</p>
+        <h2 class="vraagtekst">${esc(tekst)}</h2>
+        <div class="muurknoppen ${finale ? 'twee' : ''}">
+          ${knoppen.map(k => `<button class="plaats" data-act="antwoord" data-waarde="${k.waarde}">
+            <span class="pijltje">${k.pijl}</span><span>${k.label}</span></button>`).join('')}
+        </div>
+      </main>
+      <div class="straf ${S.straf ? 'aan' : ''}" id="straf"><div><strong>Mis!</strong><p>Fout spoor… kijk nog eens goed.</p><div class="balk"><span></span></div></div></div>
+    </section>`;
+  }
+
+  // Kort scherm na een juist antwoord. Na elk tweede spoor: een streek naar de overkant.
   function schermGevonden() {
-    return `<section class="scherm gevonden">${kop()}${race()}
+    const r = D.rollen[S.rol];
+    return `<section class="scherm gevonden">${kop()}
       <main class="midden">
-        <div class="vinkje">✓</div>
+        <div class="vinkje">🐾</div>
         <h2 class="titel">Gevonden!</h2>
-        <p class="lead">${S.i < S.vragen.length ? `Spoor ${S.i} van ${S.vragen.length}` : 'Alle sporen gevonden'}</p>
+        ${streekNu()
+          ? `<button class="knop streek" data-act="streek">${streekIcoon(S.rol)} ${esc(r.streek.knop)}</button>`
+          : `<p class="lead">${S.i < D.aantalSporen ? 'Op naar het volgende spoor…' : 'Alle sporen gevonden!'}</p>`}
       </main></section>`;
   }
 
   function schermDraai() {
     const r = D.rollen[S.rol];
-    return `<section class="scherm draai">
+    return `<section class="scherm midden draai">
       <div class="pijl ${r.focusKant}">${r.focusKant === 'links' ? '⟵' : '⟶'}</div>
-      <h1 class="titel">Draai je naar <em>${r.focusKant}</em></h1>
-      <p class="lead">Het laatste spoor ligt op de grote muur.</p>
+      <h1 class="titel">Draai je <em>om!</em></h1>
+      <p class="lead">Het laatste spoor zit op de grote muur, aan je ${r.focusKant === 'links' ? 'linker' : 'rechter'}kant.</p>
     </section>`;
   }
 
   function schermEinde() {
     const gewonnen = S.einde === S.rol;
-    const vosWint = S.einde === 'vos';
-    const kop1 = vosWint ? 'De vos ontsnapt!' : 'De vos is gevangen!';
-    const sub = gewonnen
-      ? (S.rol === 'vos' ? 'Jij was de jager te slim af.' : 'Jij las de sporen het snelst.')
-      : (S.rol === 'vos' ? 'De jager was je net te snel af.' : 'De vos glipte net voor je neus weg.');
-    return `<section class="scherm einde ${gewonnen ? 'winst' : 'verlies'}">
-      <div class="overlay">
-        <div class="groot">${D.rollen[S.einde].icoon}</div>
-        <h1 class="titel">${kop1}</h1>
-        <p class="lead">${sub}</p>
-        ${gewonnen
-          ? `<div class="opdracht"><strong>${esc(D.prijs.titel)}</strong><p>${esc(D.prijs.tekst)}</p></div>`
-          : `<p class="weetje">${D.rollen[S.einde].naam} wint de penning. Volgende keer beter!</p>`}
-        <button class="knop goud" data-act="opnieuw">Nog een jacht</button>
-      </div>
+    const winnaar = D.rollen[S.einde];
+    if (gewonnen) {
+      return `<section class="scherm midden einde winst">
+        <div class="rolicoon groot" style="--k:${winnaar.kleur}">${winnaar.icoon}</div>
+        <p class="bovenschrift">${esc(winnaar.winst)}</p>
+        <h1 class="titel">Jij wint <em>de penning!</em></h1>
+        <div class="opdracht"><strong>${esc(D.prijs.titel)}</strong><p>${esc(D.prijs.tekst)}</p></div>
+        <button class="link" data-act="opnieuw">Nieuwe jacht</button>
+      </section>`;
+    }
+    return `<section class="scherm midden einde verlies">
+      <div class="rolicoon groot" style="--k:${winnaar.kleur}">${winnaar.icoon}</div>
+      <p class="bovenschrift">${esc(winnaar.winst)}</p>
+      <h1 class="titel">Net <em>niet…</em></h1>
+      <p class="lead">${winnaar.naam} was je te snel af en gaat met de penning lopen.</p>
+      <button class="knop goud" data-act="opnieuw">Nog een jacht</button>
     </section>`;
   }
 
   /* ---------- spelverloop ---------- */
   function begin() {
-    S.scherm = 'aftellen';
+    G.stopSfeer();
+    S.scherm = 'hoorn';
     toon();
-    let n = 3;
-    const tik = () => {
-      n -= 1;
-      const el = document.getElementById('teller');
-      if (n > 0) { if (el) el.textContent = n; wacht(tik, 900); }
-      else { S.scherm = 'vraag'; toon(); }
-    };
-    wacht(tik, 900);
+    G.roep(() => {
+      if (S.scherm !== 'hoorn') return;
+      S.scherm = 'aftellen';
+      toon();
+      G.tik(false);
+      let n = 3;
+      const tel = () => {
+        n -= 1;
+        const el = document.getElementById('teller');
+        if (n > 0) {
+          if (el) { el.textContent = n; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+          G.tik(false);
+          wacht(tel, 800);
+        } else {
+          G.tik(true);
+          S.scherm = 'vraag';
+          toon();
+        }
+      };
+      wacht(tel, 800);
+    });
   }
 
-  function goed() {
-    const finale = S.i >= S.vragen.length;
-    if (finale) {
+  function antwoord(knop) {
+    const q = huidig();
+    const juist = q ? q.antwoord : D.finale.juist;
+    if (knop.dataset.waarde !== juist) return fout(knop);
+
+    if (!q) { // laatste spoor gevonden: gewonnen
       zend({ type: 'winst', rol: S.rol });
       einde(S.rol);
       return;
     }
     S.i += 1;
     S.voortgang[S.rol] = S.i;
-    S.opties = null;
     zend({ type: 'voortgang', rol: S.rol, n: S.i });
+    G.ting();
+    G.stappen();
     S.scherm = 'gevonden';
     toon();
-    wacht(verder, 1300);
+    const streek = streekNu();
+    wacht(() => { if (streek) stuurStreek(); verder(); }, streek ? 2600 : 1300);
   }
 
   function fout(knop) {
-    if (knop) knop.classList.add('fout');
+    knop.classList.add('fout');
+    G.kraai();
     S.straf = true;
     const el = document.getElementById('straf');
     if (el) el.classList.add('aan');
@@ -291,14 +323,36 @@
       S.straf = false;
       const e = document.getElementById('straf');
       if (e) e.classList.remove('aan');
+      knop.classList.remove('fout');
     }, STRAF_MS);
   }
 
+  // Streek naar de overkant (één keer per moment, ook als niemand op de knop tikt)
+  function stuurStreek() {
+    if (S.streek === S.i) return;
+    S.streek = S.i;
+    zend({ type: 'streek', rol: S.rol });
+    S.rol === 'vos' ? G.mist() : G.blaf();
+  }
+
+  // De streek van de tegenspeler: mist (van de vos) of geblaf (van de jager)
+  function ondergaStreek(vanRol) {
+    const r = D.rollen[vanRol];
+    const laag = document.createElement('div');
+    laag.className = `streeklaag ${vanRol === 'vos' ? 'mistlaag' : 'geblaf'}`;
+    laag.innerHTML = `<div class="streektekst"><span>${streekIcoon(vanRol)}</span>${esc(r.streek.melding)}</div>`;
+    document.body.appendChild(laag);
+    if (vanRol === 'vos') G.mist();
+    else { G.blaf(); document.body.classList.add('schud'); }
+    setTimeout(() => { laag.remove(); document.body.classList.remove('schud'); }, STREEK_MS);
+  }
+
   function verder() {
-    if (S.i >= S.vragen.length) {
+    if (S.i >= S.sporen.length) {
       S.scherm = 'draai';
       toon();
-      wacht(() => { S.scherm = 'vraag'; toon(); }, 3500);
+      G.kort();
+      wacht(() => { S.scherm = 'vraag'; toon(); }, 3200);
     } else {
       S.scherm = 'vraag';
       toon();
@@ -307,10 +361,28 @@
 
   function einde(winnaar) {
     stopTimers();
+    G.stopHartslag();
     S.einde = winnaar;
     S.scherm = 'einde';
     toon();
+    if (winnaar === S.rol) { G.hallali(); vonken(); } else G.droevig();
     wacht(() => reset(S.rol), RESET_NA_EINDE_MS);
+  }
+
+  // gouden vonken voor de winnaar
+  function vonken() {
+    const laag = document.createElement('div');
+    laag.className = 'vonken';
+    for (let i = 0; i < 60; i++) {
+      const v = document.createElement('i');
+      v.style.left = Math.random() * 100 + '%';
+      v.style.setProperty('--x', (Math.random() * 160 - 80) + 'px');
+      v.style.animationDelay = Math.random() * 1.2 + 's';
+      v.style.animationDuration = 2 + Math.random() * 2 + 's';
+      laag.appendChild(v);
+    }
+    document.body.appendChild(laag);
+    setTimeout(() => laag.remove(), 5000);
   }
 
   function melding(tekst) {
@@ -336,32 +408,28 @@
     } else if (act === 'solo') {
       S.solo = true;
       begin();
-    } else if (act === 'muur') {
-      b.dataset.werk === huidigeVraag().antwoord ? goed() : fout(b);
-    } else if (act === 'keuze') {
-      b.dataset.waarde === huidigeVraag().juist ? goed() : fout(b);
-    } else if (act === 'verder') {
-      verder();
+    } else if (act === 'antwoord') {
+      antwoord(b);
+    } else if (act === 'streek') {
+      stuurStreek();
+      b.disabled = true;
+      b.textContent = 'Verstuurd!';
     } else if (act === 'opnieuw') {
       reset(S.rol, true);
     }
   });
 
-  // Terug naar het startscherm als niemand het scherm aanraakt.
+  // Geluid mag pas na een eerste aanraking (iPad); dan start ook de sfeer.
   let inactief;
   const port = () => {
+    G.ontgrendel();
+    if (S && ['start', 'kies'].includes(S.scherm)) G.startSfeer();
     clearTimeout(inactief);
     inactief = setTimeout(() => {
-      if (S && S.scherm !== 'start' && S.scherm !== 'kies') reset(S.rol, true);
+      if (S && !['start', 'kies'].includes(S.scherm)) reset(S.rol, true);
     }, INACTIEF_MS);
   };
-  ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, port, { passive: true }));
-  port();
-
-  // Lege beelden netjes opvangen
-  document.addEventListener('error', e => {
-    if (e.target.tagName === 'IMG') e.target.classList.add('kapot');
-  }, true);
+  ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, port, { passive: true, capture: true }));
 
   const startRol = ['vos', 'jager'].includes(params.get('rol')) ? params.get('rol') : null;
   reset(startRol);
