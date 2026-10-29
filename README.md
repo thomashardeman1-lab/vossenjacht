@@ -32,7 +32,7 @@ bewaren in zijn **digitale jachtkamer** op de gsm (`jachtkamer.html`).
 3. Na elk juist antwoord: het echte schilderij met een weetje.
 4. Wie de 5 sporen heeft, draait zich naar de grote muur. Het laatste spoor
    gaat over het medaillon naast het gordijn.
-5. Wie dat eerst juist heeft, wint: het embleem draait binnen als een munt,
+5. Wie dat eerst juist heeft, wint: de penning draait binnen als een munt, er valt confetti,
    de hoorn blaast het hallali, de speler krijgt de opdracht de penning te
    nemen en tegen de lezer aan de grote muur te houden, en ziet een QR-code
    naar zijn digitale jachtkamer.
@@ -55,12 +55,13 @@ penning/        het embleem als los bestand om de penning te laten maken
 
 ## Vormgeving
 
-- **Opbouw:** een kanten embleem in het midden, gedraaide tekstblokken en
-  MSK-badges in de marges, het woordmerk *Vossenjacht.* in de vier hoeken.
-- **Typografie:** zware smalle blokletters met 3D-schaduw (Big Shoulders
-  Display), een retro penseelschrift (Yellowtail) en kleine kapitalen tussen
-  lijntjes (Barlow Condensed), zoals oude jacht- en visetiketten.
-- **Kleuren:** warm zwart, jachtgeel, blaze-oranje en rood.
+Speels en eenvoudig, in de stijl van een oud badge:
+- **Kader:** elk scherm zit in een afgeronde blauwe rand met een groen binnenlijntje, op muntgroen.
+- **Letter:** Jost, een heldere geometrische letter (zoals Futura).
+- **Kleuren:** muntgroen, blauw, groen, vossenoranje en room.
+- **Speels:** een vos die meekijkt bij elke vraag, pootafdrukken als voortgang,
+  confetti bij elk gevonden spoor, een "Oeps!"-scherm bij een fout, en een
+  penning die als een munt binnendraait voor de winnaar.
 
 De lettertypes komen van Google Fonts en hebben dus internet nodig. Voor de
 installatie is het veiliger ze lokaal in de repository te zetten (map `fonts/`
@@ -68,25 +69,12 @@ met de .woff2-bestanden en `@font-face`-regels in `style.css`).
 
 ## De penning
 
-In `penning/` staat het embleem als vectorbestand:
+De penning is een afgeronde driehoek met een jachthond en een vos. In `penning/`:
 
-- `penning-donker.svg` / `.png`: licht op donker, met borduursteek (zoals op de schermen)
-- `penning-licht.svg`: donker op wit, zonder steek, om te laten graveren, drukken of borduren
+- `penning-kleur.svg` / `.png`: in kleur, zoals op de schermen
+- `penning-zwartwit.svg`: zwart op wit, om te laten graveren, drukken of borduren
 
-Wil je het embleem aanpassen, dan doe je dat in `js/embleem.js`.
-
-Vragen of teksten aanpassen? Enkel `js/data.js` bewerken.
-
-## De jachthoorn
-
-Het spel speelt een nagebootste natuurhoorn af (enkel de natuurtonen van D,
-zoals een echte *trompe de chasse*). Een echte opname klinkt natuurlijk beter:
-zet een mp3 in een map `audio/` en vul het pad in bij `MSK.geluid.hoorn` en
-`MSK.geluid.hallali` in `js/data.js`. Vrij te gebruiken opnames vind je onder
-meer op Wikimedia Commons ("trompe de chasse", "hunting horn") of Freesound.
-
-iPads spelen pas geluid na een aanraking; het spel ontgrendelt het geluid bij
-de knop *Ik ben klaar*. Zet het volume van de iPads niet op stil.
+Wil je de penning aanpassen, dan doe je dat in `js/embleem.js`.
 
 ## De digitale jachtkamer
 
