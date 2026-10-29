@@ -121,55 +121,12 @@ window.MSK = {
     ]
   },
 
-  /*
-   * Laatste spoor: de speler draait zich naar de bovenmuur.
-   * De vossenjacht zelf hangt achter een gordijn en blijft geheim,
-   * dus het laatste spoor gaat over het medaillon ernaast.
-   */
+  // Laatste spoor: beide spelers draaien zich naar de bovenmuur.
   finale: {
-    type: 'keuze',
-    tekst: 'Op de grote muur hangt een rond medaillon vol jachtbuit. Waaruit is het gemaakt?',
-    opties: ['Gesneden hout', 'Wit marmer', 'Gegoten brons', 'Gips'],
-    juist: 'Gesneden hout' // nog na te kijken aan het echte werk
-  },
-
-  // Wat de winnaar te zien krijgt.
-  prijs: {
-    titel: 'Neem je penning',
-    tekst: 'Houd je penning tegen de lezer aan de grote muur. Wat er dan gebeurt, is enkel voor jou.',
-    bewaar: 'Scan de code met je gsm en bewaar je penning in je digitale jachtkamer.'
-  },
-
-  /*
-   * De digitale jachtkamer (jachtkamer.html): de zaal per muur.
-   * Het geheime werk wordt digitaal nooit getoond, enkel in de zaal zelf.
-   * Teksten voor werken zonder vraag staan bij `teksten`; voor de andere
-   * werken gebruikt de jachtkamer het weetje uit de vragen.
-   */
-  zaal: {
-    naam: 'De jachtzaal',
-    geheim: 'vossenjacht',
-    muren: [
-      { naam: 'Kant 1', werken: ['markt', 'everzwijn', 'roerdomp'] },
-      { naam: 'Kant 3', werken: ['landschap', 'uil', 'pauw'] },
-      { naam: 'De grote muur', werken: ['vossenjacht', 'stier', 'medaillon'] },
-      { naam: 'Onderkant', werken: ['doden', 'samenkomst'] }
-    ],
-    teksten: {
-      stier: 'Een stier vecht zich vrij van een roedel honden. Paul de Vos schilderde het gevecht zelf, de jagers blijven buiten beeld.',
-      medaillon: 'Een gesneden medaillon vol jachtbuit, fruit en wild: de jacht als symbool van overvloed.',
-      doden: 'Een Engelse jachtpartij op het domein Hascombe in Surrey, geschilderd door een Gentenaar die zo lang in Engeland woonde dat ze hem "de Engelsman" noemden.',
-      samenkomst: 'De tegenhanger van Het doden van het hert: het gezelschap verzamelt zich voor de jacht, gesigneerd linksonder op een stenen sokkel.'
-    }
-  },
-
-  /*
-   * Geluid: zet `hoorn` op een bestand (bv. 'audio/hoorn.mp3') om een echte
-   * opname van een jachthoorn te gebruiken. Bij null speelt het spel een
-   * nagebootste jachthoorn af.
-   */
-  geluid: {
-    hoorn: null,
-    hallali: null
+    type: 'keuze', werk: 'vossenjacht',
+    tekst: 'Zoek De vossenjacht van Paul de Vos. Wie zie je níet in dit schilderij?',
+    opties: ['De jager', 'De vos', 'Een hond met een halsband', 'Wolken'],
+    juist: 'De jager',
+    weetje: 'Bij Paul de Vos draait alles om het gevecht tussen de dieren. De menselijke jagers blijven opvallend vaak buiten beeld.'
   }
 };
