@@ -142,24 +142,40 @@
       kies: schermKies, start: schermStart, hoorn: schermHoorn, aftellen: schermAftellen,
       vraag: schermVraag, gevonden: schermGevonden, draai: schermDraai, einde: schermEinde
     }[S.scherm];
-    app.innerHTML = f();
-    app.dataset.rol = S.rol || '';
+    app.innerHTML = `<div class="ticket">${f()}</div>`;
+    document.body.dataset.rol = S.rol || '';
     app.dataset.scherm = S.scherm;
-    const scherm = app.firstElementChild;
+    const scherm = app.querySelector('.scherm');
     if (scherm) requestAnimationFrame(() => scherm.classList.add('in'));
   }
 
-  const rolBadge = rol => `<span class="rolbadge" style="--k:${D.rollen[rol].kleur}">${D.rollen[rol].icoon} ${D.rollen[rol].naam}</span>`;
+  // Beelden en kleine tekeningen
+  const LOGO = '<img class="logo" src="img/logo.png" alt="Foxhunt">';
+  const gravure = rol => `<img class="gravure" src="img/${rol}.png" alt="">`;
+  const POOT = '<svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="27" rx="9" ry="8"/><ellipse cx="8" cy="16" rx="4" ry="5"/><ellipse cx="16" cy="9" rx="4" ry="5"/><ellipse cx="24" cy="9" rx="4" ry="5"/><ellipse cx="32" cy="16" rx="4" ry="5"/></svg>';
+  const HOORN = '<svg viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"><circle cx="55" cy="62" r="30"/><circle cx="55" cy="62" r="17"/><path d="M83 52C96 44 104 34 110 20M100 12L118 30M27 72C16 80 10 90 6 100"/></g></svg>';
+  const naamGroot = rol => (rol === 'vos' ? 'Vos' : 'Jager');
+
+  // Volgnummer zoals op de tickets (per iPad bijgehouden)
+  function volgnummer(verhoog) {
+    let n = 1;
+    try {
+      n = (+localStorage.getItem('foxhunt-nummer') || 0) + (verhoog ? 1 : 0) || 1;
+      if (verhoog) localStorage.setItem('foxhunt-nummer', n);
+    } catch (e) { /* geen opslag: dan blijft het 001 */ }
+    return n;
+  }
+  const nummer = n => `<div class="nummer">N°${String(n).padStart(3, '0')}<small>MSK</small></div>`;
 
   // Voortgang: de Vos laat pootafdrukken achter, de Jager bolletjes.
   const spoor = () => {
     const n = D.aantalSporen + 1;
-    const rij = rol => `<div class="voortgang ${rol} ${rol === S.rol ? 'eigen' : ''}" style="--k:${D.rollen[rol].kleur}">
-        <span class="wie">${D.rollen[rol].icoon}</span>
+    const rij = rol => `<div class="voortgang ${rol} ${rol === S.rol ? 'eigen' : ''}">
+        <span class="wie">${rol === S.rol ? 'Jij' : naamGroot(rol)}</span>
         ${Array.from({ length: n }, (_, k) => {
           const klas = `${k < S.voortgang[rol] ? 'gezet' : ''} ${k === n - 1 ? 'laatste' : ''}`;
           if (k === n - 1) return `<i class="${klas}">★</i>`;
-          return rol === 'vos' ? `<i class="poot ${klas}">🐾</i>` : `<i class="bol ${klas}"></i>`;
+          return rol === 'vos' ? `<i class="poot ${klas}">${POOT}</i>` : `<i class="bol ${klas}"></i>`;
         }).join('')}
       </div>`;
     return `<div class="spoor">${rij(S.rol)}${S.solo ? '' : rij(ander(S.rol))}</div>`;
@@ -170,12 +186,13 @@
     if (S.solo) return '';
     const n = D.reeksVoorStreek;
     const vol = S.streekKlaar ? n : S.reeks;
-    return `<div class="reeks ${S.streekKlaar ? 'vol' : ''}" title="Juist op rij">
+    return `<div class="reeks ${S.streekKlaar ? 'vol' : ''}">
       ${Array.from({ length: n }, (_, k) => `<i class="${k < vol ? 'aan' : ''}"></i>`).join('')}
-      <span>${streekIcoon(S.rol)}</span></div>`;
+      <span>${S.rol === 'vos' ? 'Mist' : 'Honden'}</span></div>`;
   };
 
-  const kop = () => `<header class="kop">${spoor()}<div class="kop-rechts">${reeksMeter()}${rolBadge(S.rol)}</div></header>`;
+  const kop = () => `<header class="kop"><div class="badge-klein">${LOGO}</div>${spoor()}
+    <div class="kop-rechts">${reeksMeter()}<span class="kop-rol">${naamGroot(S.rol)}</span></div></header>`;
 
   function updateKop() {
     const el = app.querySelector('.kop');
@@ -183,19 +200,16 @@
   }
 
   /* ---------- schermen ---------- */
+  // Twee tickets naast elkaar: kies welke kant van de sokkel dit scherm is.
   function schermKies() {
-    return `<section class="scherm midden kies">
-      <p class="bovenschrift">Een jacht voor twee</p>
-      <h1 class="titel">De <em>Vossenjacht</em></h1>
-      <p class="lead">Welke kant van de sokkel is dit scherm?</p>
-      <div class="rolkeuze">
-        ${['vos', 'jager'].map(r => `
-          <button class="rolkaart" data-act="kies" data-rol="${r}" style="--k:${D.rollen[r].kleur}">
-            <span class="groot">${D.rollen[r].icoon}</span>
-            <strong>${D.rollen[r].naam}</strong>
-            <small>kijkt naar ${D.rollen[r].muurNaam}</small>
-          </button>`).join('')}
-      </div>
+    return `<section class="scherm kies">
+      ${['vos', 'jager'].map(r => `
+        <button class="rolticket ${r}" data-act="kies" data-rol="${r}">
+          <div class="badge-groot">${LOGO}</div>
+          <span class="rolnaam">${naamGroot(r)}</span>
+          ${gravure(r)}
+          <small>kijkt naar ${D.rollen[r].muurNaam}</small>
+        </button>`).join('')}
     </section>`;
   }
 
@@ -207,26 +221,27 @@
     else status = S.partnerAanwezig ? `${tegen.naam} staat aan de overkant.` : 'Zoek je tegenspeler aan de overkant van de sokkel.';
 
     return `<section class="scherm midden start">
-      <div class="rolicoon" style="--k:${r.kleur}">${r.icoon}</div>
-      <p class="bovenschrift">Jij bent ${r.naam.toLowerCase()}</p>
-      <h1 class="titel">De <em>Vossenjacht</em></h1>
+      <div class="badge-groot">${LOGO}</div>
+      <h1 class="rolnaam">${naamGroot(S.rol)}</h1>
+      ${gravure(S.rol)}
       <p class="lead">${esc(r.intro)}</p>
       <ol class="regels">
-        <li><span>${S.rol === 'vos' ? '🐾' : '●'}</span>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
-        <li><span>🔎</span>Volg ${D.aantalSporen} sporen. Een fout spoor kost je ${STRAF_MS / 1000} tellen.</li>
-        <li><span>${streekIcoon(S.rol)}</span>${D.reeksVoorStreek} keer juist op rij? Dan mag je je tegenspeler ${S.rol === 'vos' ? 'in mist hullen' : 'de honden op het lijf jagen'}.</li>
-        <li><span>★</span>Wie het laatste spoor eerst vindt, wint de penning.</li>
+        <li><span>I</span>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
+        <li><span>II</span>Volg ${D.aantalSporen} sporen. Een fout spoor kost je ${STRAF_MS / 1000} tellen.</li>
+        <li><span>III</span>${D.reeksVoorStreek} keer juist op rij? Dan ${S.rol === 'vos' ? 'hul je de Jager in mist' : 'laat je de honden los op de Vos'}.</li>
+        <li><span>IV</span>Wie het laatste spoor eerst vindt, wint de penning.</li>
       </ol>
-      <button class="knop goud" data-act="klaar" ${S.klaar ? 'disabled' : ''}>${S.klaar ? 'Klaar ✓' : 'Ik ben klaar'}</button>
+      <button class="knop" data-act="klaar" ${S.klaar ? 'disabled' : ''}>${S.klaar ? 'Klaar' : 'Ik ben klaar'}</button>
       <p class="status">${status}</p>
       <button class="link" data-act="solo">Alleen oefenen</button>
+      ${nummer(volgnummer(false) + 1)}
     </section>`;
   }
 
   function schermHoorn() {
     return `<section class="scherm midden hoorn">
-      <div class="hoorn-icoon">📯</div>
-      <h1 class="titel">De jacht <em>begint</em></h1>
+      <div class="hoorn-icoon">${HOORN}</div>
+      <h1 class="titel">De jacht begint</h1>
     </section>`;
   }
 
@@ -244,11 +259,11 @@
     const tekst = finale ? D.finale.tekst : q.tekst;
     const knoppen = finale ? D.finale.opties : onder ? PLAATSEN_ONDER : PLAATSEN;
     const draai = onder
-      ? `<div class="draaiwijzer ${r.onderKant}">${r.onderKant === 'links' ? '⟵' : ''} Kijk naar de muur aan je ${r.onderKant === 'links' ? 'linker' : 'rechter'}kant ${r.onderKant === 'rechts' ? '⟶' : ''}</div>`
+      ? `<div class="draaiwijzer ${r.onderKant}">${r.onderKant === 'links' ? '← ' : ''}Kijk naar de muur aan je ${r.onderKant === 'links' ? 'linker' : 'rechter'}kant${r.onderKant === 'rechts' ? ' →' : ''}</div>`
       : '';
     return `<section class="scherm vraag ${finale ? 'finale' : ''} ${onder ? 'onder' : ''}">${kop()}
       <main class="blad">
-        <p class="bovenschrift">${finale ? '★ Het laatste spoor' : `Spoor ${S.i + 1} van ${D.aantalSporen}`}</p>
+        <p class="spoornr">${finale ? '★ Het laatste spoor' : `Spoor ${S.i + 1} van ${D.aantalSporen}`}</p>
         ${draai}
         <h2 class="vraagtekst">${esc(tekst)}</h2>
         <div class="muurknoppen ${knoppen.length === 2 ? 'twee' : ''}">
@@ -263,19 +278,18 @@
   // Kort scherm na een juist antwoord. Met een volle reeks: een streek uithalen.
   function schermGevonden() {
     const r = D.rollen[S.rol];
-    const nog = D.reeksVoorStreek - S.reeks;
     let onder;
     if (S.streekKlaar) {
-      onder = `<p class="bovenschrift vuur">🔥 ${D.reeksVoorStreek} op rij!</p>
-        <button class="knop streek" data-act="streek">${streekIcoon(S.rol)} ${esc(r.streek.knop)}</button>`;
+      onder = `<p class="vuur">${D.reeksVoorStreek} op rij!</p>
+        <button class="knop streek" data-act="streek">${esc(r.streek.knop)}</button>`;
     } else if (!S.solo && S.reeks > 0 && S.i < D.aantalSporen) {
-      onder = `<p class="lead">🔥 ${S.reeks} op rij. Nog ${nog} voor ${S.rol === 'vos' ? 'mist' : 'de honden'}!</p>`;
+      onder = `<p class="ondertitel">${S.reeks} op rij. Nog ${D.reeksVoorStreek - S.reeks} voor ${S.rol === 'vos' ? 'de mist' : 'de honden'}!</p>`;
     } else {
-      onder = `<p class="lead">${S.i < D.aantalSporen ? 'Op naar het volgende spoor…' : 'Alle sporen gevonden!'}</p>`;
+      onder = `<p class="ondertitel">${S.i < D.aantalSporen ? 'Op naar het volgende spoor…' : 'Alle sporen gevonden!'}</p>`;
     }
     return `<section class="scherm gevonden">${kop()}
-      <main class="midden">
-        <div class="vinkje ${S.rol}">${S.rol === 'vos' ? '🐾' : '●'}</div>
+      <main class="midden" style="flex:1;display:flex;flex-direction:column">
+        <div class="vinkje">${S.rol === 'vos' ? POOT : '<span class="bolgroot"></span>'}</div>
         <h2 class="titel">Gevonden!</h2>
         ${onder}
       </main></section>`;
@@ -285,8 +299,8 @@
     const r = D.rollen[S.rol];
     return `<section class="scherm midden draai">
       <div class="pijl ${r.focusKant}">${r.focusKant === 'links' ? '⟵' : '⟶'}</div>
-      <h1 class="titel">Draai je <em>om!</em></h1>
-      <p class="lead">Het laatste spoor zit op de grote muur, aan je ${r.focusKant === 'links' ? 'linker' : 'rechter'}kant.</p>
+      <h1 class="titel">Draai je om!</h1>
+      <p class="ondertitel">Het laatste spoor zit op de grote muur, aan je ${r.focusKant === 'links' ? 'linker' : 'rechter'}kant.</p>
     </section>`;
   }
 
@@ -295,24 +309,27 @@
     const winnaar = D.rollen[S.einde];
     if (gewonnen) {
       return `<section class="scherm midden einde winst">
-        <div class="rolicoon groot" style="--k:${winnaar.kleur}">${winnaar.icoon}</div>
-        <p class="bovenschrift">${esc(winnaar.winst)}</p>
-        <h1 class="titel">Jij wint <em>de penning!</em></h1>
+        <div class="badge-groot">${LOGO}</div>
+        <p class="ondertitel">${esc(winnaar.winst)}</p>
+        <h1 class="titel">Jij wint de penning!</h1>
         <div class="opdracht"><strong>${esc(D.prijs.titel)}</strong><p>${esc(D.prijs.tekst)}</p></div>
         <button class="link" data-act="opnieuw">Nieuwe jacht</button>
+        ${nummer(volgnummer(false))}
       </section>`;
     }
     return `<section class="scherm midden einde verlies">
-      <div class="rolicoon groot" style="--k:${winnaar.kleur}">${winnaar.icoon}</div>
-      <p class="bovenschrift">${esc(winnaar.winst)}</p>
-      <h1 class="titel">Net <em>niet…</em></h1>
+      ${gravure(S.rol)}
+      <p class="ondertitel">${esc(winnaar.winst)}</p>
+      <h1 class="titel">Net niet…</h1>
       <p class="lead">${winnaar.naam} was je te snel af en gaat met de penning lopen.</p>
-      <button class="knop goud" data-act="opnieuw">Nog een jacht</button>
+      <button class="knop" data-act="opnieuw">Nog een jacht</button>
+      ${nummer(volgnummer(false))}
     </section>`;
   }
 
   /* ---------- spelverloop ---------- */
   function begin() {
+    volgnummer(true);
     G.stopSfeer();
     S.scherm = 'hoorn';
     toon();
@@ -397,7 +414,7 @@
     const r = D.rollen[vanRol];
     const laag = document.createElement('div');
     laag.className = `streeklaag ${vanRol === 'vos' ? 'mistlaag' : 'geblaf'}`;
-    laag.innerHTML = `<div class="streektekst"><span>${streekIcoon(vanRol)}</span>${esc(r.streek.melding)}</div>`;
+    laag.innerHTML = `<div class="streektekst">${esc(r.streek.melding)}</div>`;
     document.body.appendChild(laag);
     if (vanRol === 'vos') G.mist();
     else { G.blaf(); document.body.classList.add('schud'); }

@@ -20,8 +20,8 @@ Testen op één computer: `duo.html` toont beide schermen naast elkaar.
 
 ## Spelverloop
 
-1. **Start:** een nachtelijk bos met maan, mist en vuurvliegjes; wind, krekels,
-   krakende takjes en een uil op de achtergrond.
+1. **Start:** het ticket van je rol, met het FOXHUNT-logo, je gravure en een
+   volgnummer. Op de achtergrond: wind, krekels, krakende takjes en een uil.
 2. Tikt de Vos op **Ik ben klaar**, dan keft er een vos; bij de Jager huilt een
    jachthond. Zijn beiden klaar, dan blaast de trompet de jacht in, gevolgd
    door drie tromslagen.
@@ -46,6 +46,18 @@ Testen op één computer: `duo.html` toont beide schermen naast elkaar.
 9. **Winnaar:** hallali op de trompet, gouden vonken en de opdracht om de
    NFC-penning tegen de lezer aan de grote muur te houden. **Verliezer:** een
    droevige trompet.
+
+## Vormgeving
+
+Dezelfde stijl als de tickets: elke iPad heeft de kleur van zijn ticket.
+De Vos olijfgroen (`#4a4d39`) met crème (`#e1debc`), de Jager omgekeerd.
+Een geperforeerde rand, het FOXHUNT-logo (`img/logo.png`), de gravures
+(`img/vos.png`, `img/jager.png`), de letter IM Fell English en een volgnummer
+N°001 dat per iPad oploopt.
+
+De beelden zijn nu uit kleine schermafbeeldingen geknipt en daardoor wat
+onscherp. Vervang ze door de originele bestanden (liefst PNG met een
+transparante achtergrond, of SVG) onder dezelfde naam in de map `img/`.
 
 ## Bestanden
 
