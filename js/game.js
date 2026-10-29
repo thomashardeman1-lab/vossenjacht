@@ -142,24 +142,19 @@
     else status = S.partnerAanwezig ? `${tegen.naam} is verbonden.` : `Zoek je tegenspeler aan de overkant van de sokkel.`;
 
     return `<section class="scherm start">${kop()}
-      <main class="raster">
-        <figure class="hero">
-          <img src="${beeld(D.werken.uil.iiif, 1000)}" alt="${esc(D.werken.uil.titel)}">
-          <figcaption><span>Speur door de jachtzaal</span><em>${esc(D.werken.uil.titel)}</em> — ${esc(D.werken.uil.kunstenaar)}</figcaption>
-        </figure>
-        <div class="tekst">
-          <div class="pil">Spel voor 2 spelers</div>
-          <h1 class="titel">De Digitale <em>Vossenjacht</em></h1>
-          <p class="lead">Jij bent <strong style="color:${r.kleur}">${r.naam.toLowerCase()}</strong>. ${esc(r.intro)}</p>
-          <ol class="regels">
-            <li>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
-            <li>Los ${S.vragen.length} sporen op. Een fout antwoord kost je ${STRAF_MS / 1000} seconden.</li>
-            <li>Wie eerst klaar is, mag als eerste naar het laatste spoor op de grote muur.</li>
-          </ol>
-          <button class="knop goud" data-act="klaar" ${S.klaar ? 'disabled' : ''}>${S.klaar ? 'Klaar ✓' : 'Ik ben klaar'}</button>
-          <p class="status">${status}</p>
-          <button class="link" data-act="solo">Oefenen zonder tegenspeler</button>
-        </div>
+      <main class="midden uitleg">
+        <div class="pil">Spel voor 2 spelers</div>
+        <h1 class="titel">De Digitale <em>Vossenjacht</em></h1>
+        <p class="lead">Jij bent <strong style="color:${r.kleur}">${r.naam.toLowerCase()}</strong>. ${esc(r.intro)}</p>
+        <ol class="regels">
+          <li>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
+          <li>Los ${S.vragen.length} sporen op. Een fout antwoord kost je ${STRAF_MS / 1000} seconden.</li>
+          <li>Wie eerst klaar is, draait zich naar de grote muur voor het laatste spoor.</li>
+          <li>Wie dat als eerste vindt, wint de penning.</li>
+        </ol>
+        <button class="knop goud" data-act="klaar" ${S.klaar ? 'disabled' : ''}>${S.klaar ? 'Klaar ✓' : 'Ik ben klaar'}</button>
+        <p class="status">${status}</p>
+        <button class="link" data-act="solo">Oefenen zonder tegenspeler</button>
       </main></section>`;
   }
 
