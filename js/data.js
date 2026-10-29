@@ -121,12 +121,32 @@ window.MSK = {
     ]
   },
 
-  // Laatste spoor: beide spelers draaien zich naar de bovenmuur.
+  /*
+   * Laatste spoor: de speler draait zich naar de bovenmuur.
+   * De vossenjacht zelf hangt achter een gordijn en blijft geheim,
+   * dus het laatste spoor gaat over het medaillon ernaast.
+   */
   finale: {
-    type: 'keuze', werk: 'vossenjacht',
-    tekst: 'Zoek De vossenjacht van Paul de Vos. Wie zie je níet in dit schilderij?',
-    opties: ['De jager', 'De vos', 'Een hond met een halsband', 'Wolken'],
-    juist: 'De jager',
-    weetje: 'Bij Paul de Vos draait alles om het gevecht tussen de dieren. De menselijke jagers blijven opvallend vaak buiten beeld.'
+    type: 'keuze',
+    tekst: 'Naast het gordijn hangt een rond medaillon vol jachtbuit. Waaruit is het gemaakt?',
+    opties: ['Gesneden hout', 'Wit marmer', 'Gegoten brons', 'Gips'],
+    juist: 'Gesneden hout' // nog na te kijken aan het echte werk
+  },
+
+  // Wat de winnaar te zien krijgt.
+  prijs: {
+    titel: 'Neem je jachtkaart',
+    tekst: 'Houd je kaart tegen de lezer bij het gordijn op de grote muur. Alleen jij krijgt te zien wat erachter hangt.',
+    weetje: 'Kijk goed als het gordijn opengaat: bij Paul de Vos blijven de menselijke jagers opvallend vaak buiten beeld.'
+  },
+
+  /*
+   * Geluid: zet `hoorn` op een bestand (bv. 'audio/hoorn.mp3') om een echte
+   * opname van een jachthoorn te gebruiken. Bij null speelt het spel een
+   * nagebootste jachthoorn af.
+   */
+  geluid: {
+    hoorn: null,
+    hallali: null
   }
 };
