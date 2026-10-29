@@ -135,8 +135,8 @@ window.MSK = {
 
   // Wat de winnaar te zien krijgt.
   prijs: {
-    titel: 'Neem je jachtkaart',
-    tekst: 'Houd je kaart tegen de lezer bij het gordijn op de grote muur. Alleen jij krijgt te zien wat erachter hangt.',
+    titel: 'Neem je penning',
+    tekst: 'Houd je penning tegen de lezer bij het gordijn op de grote muur. Alleen jij krijgt te zien wat erachter hangt.',
     weetje: 'Kijk goed als het gordijn opengaat: bij Paul de Vos blijven de menselijke jagers opvallend vaak buiten beeld.'
   },
 

@@ -7,7 +7,8 @@ daar sporen in de schilderijen.
 
 *De vossenjacht* van Paul de Vos hangt verborgen achter een gordijn. Enkel de
 winnaar krijgt het schilderij op zijn scherm te zien en krijgt een
-**jachtkaart met NFC-chip**. Met die kaart opent hij het gordijn in de zaal.
+**penning (token) met NFC-chip**. Met die penning opent hij het gordijn in de zaal.
+Het embleem op de schermen is het ontwerp van die penning.
 
 ## Opstelling
 
@@ -25,7 +26,7 @@ winnaar krijgt het schilderij op zijn scherm te zien en krijgt een
 4. Wie de 5 sporen heeft, draait zich naar de grote muur. Het laatste spoor
    gaat over het medaillon naast het gordijn.
 5. Wie dat eerst juist heeft, wint: het gordijn op het scherm gaat open, de
-   hoorn blaast het hallali en de speler krijgt de opdracht de jachtkaart te
+   hoorn blaast het hallali en de speler krijgt de opdracht de penning te
    nemen en bij het gordijn te scannen. De verliezer ziet het schilderij niet.
 6. Na 60 seconden (of 2 minuten zonder aanraking) gaat alles terug naar het begin.
 
@@ -34,11 +35,35 @@ winnaar krijgt het schilderij op zijn scherm te zien en krijgt een
 ```
 index.html      het spel
 duo.html        testpagina: beide schermen naast elkaar
-css/style.css   vormgeving (stijl van een oud jachtboek)
+css/style.css   vormgeving
 js/data.js      ALLE inhoud: werken, vragen, weetjes, prijs, geluid
+js/embleem.js   het embleem = ontwerp van de penning
 js/hoorn.js     de jachthoorn
 js/game.js      spellogica
+penning/        het embleem als los bestand om de penning te laten maken
 ```
+
+## Vormgeving
+
+- **Opbouw:** een kanten embleem in het midden, gedraaide tekstblokken en
+  MSK-badges in de marges, het woordmerk *Vossenjacht.* in de vier hoeken.
+- **Typografie:** zware smalle blokletters met 3D-schaduw (Big Shoulders
+  Display), een retro penseelschrift (Yellowtail) en kleine kapitalen tussen
+  lijntjes (Barlow Condensed), zoals oude jacht- en visetiketten.
+- **Kleuren:** warm zwart, jachtgeel, blaze-oranje en rood.
+
+De lettertypes komen van Google Fonts en hebben dus internet nodig. Voor de
+installatie is het veiliger ze lokaal in de repository te zetten (map `fonts/`
+met de .woff2-bestanden en `@font-face`-regels in `style.css`).
+
+## De penning
+
+In `penning/` staat het embleem als vectorbestand:
+
+- `penning-donker.svg` / `.png`: licht op donker, met borduursteek (zoals op de schermen)
+- `penning-licht.svg`: donker op wit, zonder steek, om te laten graveren, drukken of borduren
+
+Wil je het embleem aanpassen, dan doe je dat in `js/embleem.js`.
 
 Vragen of teksten aanpassen? Enkel `js/data.js` bewerken.
 
@@ -53,21 +78,22 @@ meer op Wikimedia Commons ("trompe de chasse", "hunting horn") of Freesound.
 iPads spelen pas geluid na een aanraking; het spel ontgrendelt het geluid bij
 de knop *Ik ben klaar*. Zet het volume van de iPads niet op stil.
 
-## Het gordijn en de NFC-kaart
+## Het gordijn en de NFC-penning
 
 Het openen van het gordijn gebeurt buiten deze website, met eigen hardware bij
 het schilderij. Een eenvoudige opbouw:
 
 - een **NFC-lezer** (bv. PN532 of RC522) naast het gordijn;
-- een **microcontroller** (bv. ESP32 of Arduino) die de kaartnummers (UID) van
-  de jachtkaarten herkent;
+- een **microcontroller** (bv. ESP32 of Arduino) die de nummers (UID) van
+  de penningen herkent;
 - een **motor** of gordijnrail die het gordijn opent en na een minuut weer sluit.
 
-De kaarten zelf zijn gewone NFC-kaarten (bv. NTAG215). De medewerker of een
-automaat geeft de kaart aan de winnaar. De tekst die de winnaar ziet, pas je
+De penningen zijn gewone NFC-tags (bv. NTAG215, ook als ronde of ovale token
+te koop) met het embleem erop. De medewerker of een automaat geeft de
+penning aan de winnaar. De tekst die de winnaar ziet, pas je
 aan bij `MSK.prijs` in `js/data.js`.
 
-Later kan het spel de kaart-uitgifte ook rechtstreeks aansturen (bv. een
+Later kan het spel de uitgifte van de penning ook rechtstreeks aansturen (bv. een
 automaat in de sokkel), maar dat hangt af van de hardware die gekozen wordt.
 
 ## Online zetten met GitHub Pages
