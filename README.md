@@ -21,8 +21,10 @@ naar het laatste spoor op de grote muur met *De vossenjacht* van Paul de Vos.
 3. Na elk juist antwoord: het echte schilderij met een weetje.
 4. Wie de 5 sporen heeft, krijgt de opdracht zich om te draaien naar de
    bovenmuur en krijgt de finalevraag.
-5. Eerste juiste finale-antwoord wint. Het eindscherm laat *De vossenjacht*
-   tot leven komen. Na 45 seconden (of 2 minuten zonder aanraking) gaat alles
+5. Eerste juiste finale-antwoord wint. De winnaar krijgt de opdracht de
+   NFC-penning te nemen en tegen de lezer aan de grote muur te houden; daar
+   gaat het gordijn voor *De vossenjacht* open. Het schilderij wordt nooit op
+   het scherm getoond. Na 45 seconden (of 2 minuten zonder aanraking) gaat alles
    terug naar het begin.
 
 ## Bestanden

@@ -144,8 +144,8 @@
     return `<section class="scherm start">${kop()}
       <main class="raster">
         <figure class="hero">
-          <img src="${beeld(D.werken.vossenjacht.iiif, 1000)}" alt="${esc(D.werken.vossenjacht.titel)}">
-          <figcaption><span>Het doel van de jacht</span><em>${esc(D.werken.vossenjacht.titel)}</em> — ${esc(D.werken.vossenjacht.kunstenaar)}</figcaption>
+          <img src="${beeld(D.werken.uil.iiif, 1000)}" alt="${esc(D.werken.uil.titel)}">
+          <figcaption><span>Speur door de jachtzaal</span><em>${esc(D.werken.uil.titel)}</em> — ${esc(D.werken.uil.kunstenaar)}</figcaption>
         </figure>
         <div class="tekst">
           <div class="pil">Spel voor 2 spelers</div>
@@ -242,7 +242,7 @@
     return `<section class="scherm draai">
       <div class="pijl ${r.focusKant}">${r.focusKant === 'links' ? '⟵' : '⟶'}</div>
       <h1 class="titel">Draai je naar <em>${r.focusKant}</em></h1>
-      <p class="lead">Het laatste spoor ligt op de grote muur met het werk van Paul de Vos.</p>
+      <p class="lead">Het laatste spoor ligt op de grote muur.</p>
     </section>`;
   }
 
@@ -253,14 +253,14 @@
     const sub = gewonnen
       ? (S.rol === 'vos' ? 'Jij was de jager te slim af.' : 'Jij las de sporen het snelst.')
       : (S.rol === 'vos' ? 'De jager was je net te snel af.' : 'De vos glipte net voor je neus weg.');
-    const v = D.werken.vossenjacht;
     return `<section class="scherm einde ${gewonnen ? 'winst' : 'verlies'}">
-      <div class="doek"><img src="${beeld(v.iiif, 1600)}" alt="${esc(v.titel)}"></div>
       <div class="overlay">
         <div class="groot">${D.rollen[S.einde].icoon}</div>
         <h1 class="titel">${kop1}</h1>
         <p class="lead">${sub}</p>
-        <p class="weetje">${esc(D.finale.weetje)}</p>
+        ${gewonnen
+          ? `<div class="opdracht"><strong>${esc(D.prijs.titel)}</strong><p>${esc(D.prijs.tekst)}</p></div>`
+          : `<p class="weetje">${D.rollen[S.einde].naam} wint de penning. Volgende keer beter!</p>`}
         <button class="knop goud" data-act="opnieuw">Nog een jacht</button>
       </div>
     </section>`;

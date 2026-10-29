@@ -15,7 +15,8 @@
  */
 window.MSK = {
   werken: {
-    vossenjacht: { titel: 'De vossenjacht', kunstenaar: 'Paul de Vos', inv: '1902-B', iiif: 327, b: 220, h: 157 },
+    vossenjacht: { titel: 'De vossenjacht', kunstenaar: 'Paul de Vos', inv: '1902-B', iiif: null, // nooit tonen op het scherm
+    b: 220, h: 157 },
     stier:       { titel: 'Stier door honden aangevallen', kunstenaar: 'Paul de Vos', inv: '1940-B', iiif: null },
     medaillon:   { titel: 'Medaillon met symbolische voorstelling van de jacht', kunstenaar: 'Laurent van der Meulen', iiif: null },
 
@@ -122,11 +123,18 @@ window.MSK = {
   },
 
   // Laatste spoor: beide spelers draaien zich naar de bovenmuur.
+  // Het schilderij De vossenjacht wordt nooit op het scherm getoond:
+  // het laatste spoor gaat daarom over het medaillon op de grote muur.
   finale: {
-    type: 'keuze', werk: 'vossenjacht',
-    tekst: 'Zoek De vossenjacht van Paul de Vos. Wie zie je níet in dit schilderij?',
-    opties: ['De jager', 'De vos', 'Een hond met een halsband', 'Wolken'],
-    juist: 'De jager',
-    weetje: 'Bij Paul de Vos draait alles om het gevecht tussen de dieren. De menselijke jagers blijven opvallend vaak buiten beeld.'
+    type: 'keuze',
+    tekst: 'Op de grote muur hangt een rond medaillon vol jachtbuit. Waaruit is het gemaakt?',
+    opties: ['Gesneden hout', 'Wit marmer', 'Gegoten brons', 'Gips'],
+    juist: 'Gesneden hout' // nog na te kijken aan het echte werk
+  },
+
+  // Wat de winnaar te zien krijgt: de opdracht om de NFC-penning te nemen.
+  prijs: {
+    titel: 'Neem je penning',
+    tekst: 'Houd je NFC-penning tegen de lezer aan de grote muur. Wat er dan gebeurt, is enkel voor jou.'
   }
 };

@@ -205,6 +205,9 @@ img.kapot { visibility: hidden; }
   background: radial-gradient(circle at 50% 50%, rgba(8, 10, 8, .55), rgba(8, 10, 8, .9));
 }
 .overlay .weetje { max-width: 640px; color: var(--tekst2); }
+.opdracht { max-width: 620px; margin: 4px 0 28px; padding: 22px 28px; border: 1px solid var(--goud); border-radius: 16px; background: rgba(80, 50, 10, .35); }
+.opdracht strong { display: block; font-family: var(--serif); font-size: 30px; color: var(--goud-licht); margin-bottom: 6px; }
+.opdracht p { margin: 0; font-size: 19px; line-height: 1.55; }
 .verlies .doek img { filter: grayscale(.6) brightness(.8); }
 
 /* ---------- melding ---------- */
