@@ -6,10 +6,11 @@
  *   index.html?rol=jager   (kijkt naar kant 1)
  * Zonder ?rol= kies je de rol op het scherm.
  *
- * De vossenjacht van Paul de Vos hangt achter een gordijn. Enkel de winnaar
- * krijgt het schilderij op zijn scherm te zien, en krijgt een penning (token)
- * met NFC-chip om het gordijn in de zaal te openen. Het embleem op de
- * schermen (js/embleem.js) is het ontwerp van die penning.
+ * De winnaar krijgt een penning (token) met NFC-chip. Wat die penning in de
+ * zaal doet, blijft fysiek: het spel toont het niet en zegt er niets over.
+ * Het embleem op de schermen (js/embleem.js) is het ontwerp van de penning.
+ * Via een QR-code bewaart de winnaar zijn penning ook digitaal op zijn gsm
+ * (jachtkamer.html).
  *
  * Synchronisatie: in dit prototype praten de twee schermen via
  * BroadcastChannel. Dat werkt tussen tabbladen/iframes in dezelfde browser
@@ -64,6 +65,8 @@
       vragen: rol ? D.vragen[rol] : [],
       i: 0,
       voortgang: { vos: 0, jager: 0 },
+      startTijd: 0,
+      fouten: 0,
       straf: false,
       opties: null,
       einde: null
@@ -168,7 +171,7 @@
     return `<section class="scherm start">${rand()}
       <main class="inhoud raster">
         <div class="embleem-groot zweef">${embleem('start')}
-          <p class="onderschrift script">Win de penning, open het gordijn</p>
+          <p class="onderschrift script">Win de penning</p>
         </div>
         <div class="tekst">
           ${lijnlabel('Zie', 'Spel voor twee', 'Vind')}
@@ -177,7 +180,7 @@
           <ol class="regels">
             <li><span>01</span>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
             <li><span>02</span>Los ${S.vragen.length} sporen op. Een fout kost je ${STRAF_MS / 1000} seconden.</li>
-            <li><span>03</span>Wie het laatste spoor eerst vindt, wint de penning en opent het gordijn.</li>
+            <li><span>03</span>Wie het laatste spoor eerst vindt, wint de penning.</li>
           </ol>
           <button class="knop" data-act="klaar" ${S.klaar ? 'disabled' : ''}>${S.klaar ? 'Klaar!' : 'Ik ben klaar'}</button>
           <p class="status">${status}</p>
@@ -287,14 +290,13 @@
         <div class="pijl ${r.focusKant}">${r.focusKant === 'links' ? '←' : '→'}</div>
         <p class="script groot-script">het laatste spoor</p>
         <h1 class="titel"><span class="blokletter">Draai je naar ${r.focusKant}</span></h1>
-        ${lijnlabel('Zie', 'Kijk naar de grote muur met het gordijn', 'Vind')}
+        ${lijnlabel('Zie', 'Kijk naar de grote muur', 'Vind')}
       </main></section>`;
   }
 
   function schermEinde() {
     const gewonnen = S.einde === S.rol;
     if (gewonnen) {
-      const v = D.werken.vossenjacht;
       return `<section class="scherm einde winst">${rand()}
         <main class="inhoud raster">
           <div class="embleem-groot penning">${embleem('winst')}</div>
@@ -306,11 +308,10 @@
               <div class="nfc" aria-hidden="true"><span></span><span></span><span></span></div>
               <div><strong class="blokletter">${esc(D.prijs.titel)}</strong><p>${esc(D.prijs.tekst)}</p></div>
             </div>
-            <div class="onthulling">
-              <img src="${beeld(v.iiif, 1200)}" alt="${esc(v.titel)}">
-              <div class="kant links"></div><div class="kant rechts"></div>
+            <div class="bewaar">
+              <div class="qr" id="qr"></div>
+              <div><p class="script klein-script">Neem hem mee</p><p>${esc(D.prijs.bewaar)}</p></div>
             </div>
-            <p class="bijschrift"><b>${esc(v.titel)}</b> · ${esc(v.kunstenaar)} — ${esc(D.prijs.weetje)}</p>
             <button class="link" data-act="opnieuw">Nieuwe jacht starten</button>
           </div>
         </main></section>`;
@@ -319,7 +320,7 @@
       <main class="inhoud midden">
         <div class="embleem-klein dof">${embleem('verlies')}</div>
         <p class="script groot-script">${S.rol === 'vos' ? 'de jager was sneller' : 'de vos glipte weg'}</p>
-        <h1 class="titel"><span class="blokletter">Het gordijn blijft dicht</span></h1>
+        <h1 class="titel"><span class="blokletter">De penning is weg</span></h1>
         <p class="lead">${D.rollen[S.einde].naam} vond het laatste spoor eerst en wint de penning.</p>
         <button class="knop" data-act="opnieuw">Nog een jacht</button>
       </main></section>`;
@@ -338,7 +339,7 @@
         n -= 1;
         const el = document.getElementById('teller');
         if (n > 0) { if (el) el.textContent = n; wacht(tik, 900); }
-        else { S.scherm = 'vraag'; toon(); }
+        else { S.startTijd = Date.now(); S.scherm = 'vraag'; toon(); }
       };
       wacht(tik, 900);
     });
@@ -361,6 +362,7 @@
   function fout(knop) {
     if (knop) knop.classList.add('fout');
     S.straf = true;
+    S.fouten += 1;
     const el = document.getElementById('straf');
     if (el) el.classList.add('aan');
     wacht(() => {
@@ -386,8 +388,43 @@
     S.einde = winnaar;
     S.scherm = 'einde';
     toon();
-    if (winnaar === S.rol) window.Hoorn.hallali();
+    if (winnaar === S.rol) {
+      window.Hoorn.hallali();
+      toonQR();
+    }
     wacht(() => reset(S.rol), RESET_NA_EINDE_MS);
+  }
+
+  /*
+   * QR-code naar de digitale jachtkamer. De gegevens van de penning zitten in
+   * de link zelf (geen server nodig): rol, tijdstip, speelduur, fouten en
+   * een volgnummer.
+   */
+  function penningLink() {
+    const p = {
+      r: S.rol,
+      t: Date.now(),
+      d: S.startTijd ? Math.round((Date.now() - S.startTijd) / 1000) : 0,
+      f: S.fouten,
+      n: Math.floor(Date.now() / 1000) % 10000
+    };
+    const code = btoa(JSON.stringify(p)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return new URL(`jachtkamer.html?p=${code}`, location.href).href;
+  }
+
+  function toonQR() {
+    const el = document.getElementById('qr');
+    if (!el) return;
+    const link = penningLink();
+    if (typeof window.qrcode === 'function') {
+      const qr = window.qrcode(0, 'M');
+      qr.addData(link);
+      qr.make();
+      el.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+    } else {
+      // QR-bibliotheek niet geladen (geen internet): toon een link
+      el.innerHTML = `<a class="qr-link" href="${link}" target="_blank">open je jachtkamer</a>`;
+    }
   }
 
   function melding(tekst) {

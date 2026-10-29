@@ -266,24 +266,15 @@ img.kapot { visibility: hidden; }
 .nfc span:nth-child(3) { width: 36px; height: 36px; left: 4px; animation-delay: .4s; }
 @keyframes golf { 50% { opacity: .25; } }
 
-/* het schilderij achter een kanten gordijn dat opengaat */
-.onthulling { position: relative; aspect-ratio: 220 / 157; max-height: 26vh; overflow: hidden; border: 3px solid var(--creme); background: #0e0d0b; }
-.onthulling img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: onthul 3.5s ease 2.4s both; }
-.kant {
-  position: absolute; top: 0; bottom: 0; width: 50.5%; z-index: 2; background-color: var(--zwart);
-  background-image:
-    repeating-linear-gradient(45deg, rgba(241, 230, 204, .45) 0 1px, transparent 1px 8px),
-    repeating-linear-gradient(-45deg, rgba(241, 230, 204, .45) 0 1px, transparent 1px 8px);
-  border: 0 solid var(--creme);
-}
-.kant.links { left: 0; border-right-width: 2px; animation: open-l 2.6s cubic-bezier(.65, 0, .25, 1) 2.2s forwards; }
-.kant.rechts { right: 0; border-left-width: 2px; animation: open-r 2.6s cubic-bezier(.65, 0, .25, 1) 2.2s forwards; }
-@keyframes open-l { to { transform: translateX(-101%); } }
-@keyframes open-r { to { transform: translateX(101%); } }
-@keyframes onthul { from { transform: scale(1.15); filter: brightness(.4); } }
-.bijschrift { font-size: 15px; line-height: 1.45; color: var(--creme-2); margin: 10px 0 0; }
-.bijschrift b { color: var(--creme); font-weight: 500; }
-.winst .link { margin-top: 6px; }
+/* QR-code om de penning op je gsm te bewaren */
+.bewaar { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; margin-top: 4px; }
+.bewaar p { margin: 0; line-height: 1.45; font-size: 17px; }
+.bewaar .klein-script { margin-bottom: 4px; transform: rotate(-3deg); transform-origin: left; }
+.qr { width: 132px; height: 132px; background: var(--creme); padding: 6px; display: grid; place-items: center; outline: 2.5px solid var(--creme); outline-offset: 4px; animation: in-schuif .7s cubic-bezier(.2, 1.3, .4, 1) 2s both; }
+.qr svg { width: 100%; height: 100%; display: block; }
+.qr svg rect[fill="#ffffff"], .qr svg path[fill="#ffffff"] { fill: var(--creme); }
+.qr-link { color: var(--zwart); font-family: var(--smal); font-weight: 700; text-transform: uppercase; text-align: center; font-size: 14px; }
+.winst .link { margin-top: 18px; }
 
 /* ---------- melding ---------- */
 .melding {

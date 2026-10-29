@@ -10,6 +10,13 @@ winnaar krijgt het schilderij op zijn scherm te zien en krijgt een
 **penning (token) met NFC-chip**. Met die penning opent hij het gordijn in de zaal.
 Het embleem op de schermen is het ontwerp van die penning.
 
+Het gordijn bestaat enkel fysiek: het spel toont het niet en spreekt er niet
+over, en *De vossenjacht* verschijnt nergens digitaal. Wat de penning doet,
+ontdekt de winnaar in de zaal.
+
+Daarnaast krijgt de winnaar een QR-code om zijn penning ook digitaal te
+bewaren in zijn **digitale jachtkamer** op de gsm (`jachtkamer.html`).
+
 ## Opstelling
 
 | Scherm | URL | Kijkt naar | Grote muur ligt |
@@ -25,21 +32,24 @@ Het embleem op de schermen is het ontwerp van die penning.
 3. Na elk juist antwoord: het echte schilderij met een weetje.
 4. Wie de 5 sporen heeft, draait zich naar de grote muur. Het laatste spoor
    gaat over het medaillon naast het gordijn.
-5. Wie dat eerst juist heeft, wint: het gordijn op het scherm gaat open, de
-   hoorn blaast het hallali en de speler krijgt de opdracht de penning te
-   nemen en bij het gordijn te scannen. De verliezer ziet het schilderij niet.
+5. Wie dat eerst juist heeft, wint: het embleem draait binnen als een munt,
+   de hoorn blaast het hallali, de speler krijgt de opdracht de penning te
+   nemen en tegen de lezer aan de grote muur te houden, en ziet een QR-code
+   naar zijn digitale jachtkamer.
 6. Na 60 seconden (of 2 minuten zonder aanraking) gaat alles terug naar het begin.
 
 ## Bestanden
 
 ```
 index.html      het spel
+jachtkamer.html de digitale jachtkamer (gsm-pagina van de winnaar)
 duo.html        testpagina: beide schermen naast elkaar
 css/style.css   vormgeving
 js/data.js      ALLE inhoud: werken, vragen, weetjes, prijs, geluid
 js/embleem.js   het embleem = ontwerp van de penning
 js/hoorn.js     de jachthoorn
 js/game.js      spellogica
+js/jachtkamer.js + css/jachtkamer.css  de gsm-pagina
 penning/        het embleem als los bestand om de penning te laten maken
 ```
 
@@ -77,6 +87,33 @@ meer op Wikimedia Commons ("trompe de chasse", "hunting horn") of Freesound.
 
 iPads spelen pas geluid na een aanraking; het spel ontgrendelt het geluid bij
 de knop *Ik ben klaar*. Zet het volume van de iPads niet op stil.
+
+## De digitale jachtkamer
+
+Na het winnen toont de iPad een QR-code. Die opent `jachtkamer.html` op de
+gsm van de winnaar, met de gegevens van de penning in de link zelf (rol,
+datum, speeltijd, fouten, volgnummer): er is dus geen server of database nodig.
+De gsm onthoudt de penning, zodat wie meerdere keren wint een verzameling
+opbouwt.
+
+Op de pagina:
+- de penning, die meedraait als je je gsm kantelt;
+- de knoppen *Toevoegen aan Apple Wallet* en *Bewaren in Google Wallet*;
+- een wandeling door de jachtzaal, muur per muur, met de werken en hun
+  weetjes. Het geheime werk staat er als *Verborgen: enkel te zien in de zaal*.
+
+**Wallet-pas:** de knoppen tonen in dit prototype een voorbeeld van de pas.
+Een echte pas vraagt:
+- voor **Apple Wallet** een Apple Developer-account (± € 99 per jaar), een
+  *Pass Type ID* met certificaat, en een klein serverscript dat het
+  `.pkpass`-bestand ondertekent (of een dienst zoals PassKit, Passcreator of
+  Passslot die dat doet);
+- voor **Google Wallet** een Google Wallet API-account (gratis) en een
+  ondertekende "Save to Google Wallet"-link.
+
+Een Wallet-pas kan geen NFC gebruiken zonder speciale toestemming van Apple;
+de fysieke penning blijft dus de sleutel in de zaal, de digitale is het
+aandenken.
 
 ## Het gordijn en de NFC-penning
 

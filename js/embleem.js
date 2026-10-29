@@ -104,10 +104,10 @@
 
     const tekst = `
       <path id="${id}-boog" d="M104 405Q200 433 296 405" fill="none" stroke="none"/>
-      <text font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="21" letter-spacing="2.5" fill="${V}">
-        <textPath href="#${id}-boog" startOffset="50%" text-anchor="middle">VOSSENJACHT</textPath>
+      <text font-family="'Big Shoulders Display', Oswald, Impact, sans-serif" font-weight="900" font-size="27" letter-spacing="3" fill="${V}">
+        <textPath href="#${id}-boog" startOffset="50%" text-anchor="middle" textLength="176" lengthAdjust="spacingAndGlyphs">VOSSENJACHT</textPath>
       </text>
-      <text x="200" y="473" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="13" letter-spacing="1" fill="${V}">MSK</text>
+      <text x="200" y="474" text-anchor="middle" font-family="'Big Shoulders Display', Oswald, Impact, sans-serif" font-weight="900" font-size="16" letter-spacing="1" fill="${V}">MSK</text>
       <circle cx="200" cy="320" r="5" fill="${V}"/>`;
 
     // de "borduursteek": fijne puntjes over elke lijn
