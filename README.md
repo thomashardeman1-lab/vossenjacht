@@ -60,9 +60,8 @@ groot scherm): alle maten hangen af van de kortste schermzijde en de beelden
 vullen de vrije ruimte zonder dat er iets van het scherm valt. Liggend staat
 het startscherm in twee kolommen.
 
-De beelden zijn nu uit kleine schermafbeeldingen geknipt en daardoor wat
-onscherp. Vervang ze door de originele bestanden (liefst PNG met een
-transparante achtergrond, of SVG) onder dezelfde naam in de map `img/`.
+De beelden staan als PNG met transparante achtergrond in `img/`. Vervang ze
+gerust door nieuwe versies onder dezelfde naam.
 
 ## Bestanden
 
