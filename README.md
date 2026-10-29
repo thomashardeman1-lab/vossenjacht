@@ -51,8 +51,8 @@ Testen op één computer: `duo.html` toont beide schermen naast elkaar.
 
 Dezelfde stijl als de tickets: elke iPad heeft de kleur van zijn ticket.
 De Vos olijfgroen (`#4a4d39`) met crème (`#e1debc`), de Jager omgekeerd.
-Een geperforeerde rand, het FOXHUNT-logo (`img/logo.png`), de gravures
-(`img/vos.png`, `img/jager.png`), de jachthoorn (`img/hoorn.png`), de letter IM
+Een geperforeerde rand, het FOXHUNT-logo (`img/logo.png`), de bewegende
+gravures, de jachthoorn (`img/hoorn.png`), de letter IM
 Fell English en een volgnummer N°001 dat per iPad oploopt.
 
 De opmaak schaalt mee met elk scherm (iPad staand of liggend, telefoon,
@@ -60,8 +60,12 @@ groot scherm): alle maten hangen af van de kortste schermzijde en de beelden
 vullen de vrije ruimte zonder dat er iets van het scherm valt. Liggend staat
 het startscherm in twee kolommen.
 
-De beelden staan als PNG met transparante achtergrond in `img/`. Vervang ze
-gerust door nieuwe versies onder dezelfde naam.
+De gravures hebben een zachte rand en bewegen: de vos hapt twee keer met zijn
+bek, de jager tilt zijn geweer van zijn schouder en legt het terug. Elke
+gravure bestaat daarvoor uit twee lagen: `img/vos-basis.png` en
+`img/vos-deel.png` (de onderkaak), `img/jager-basis.png` en
+`img/jager-deel.png` (het geweer). De draaipunten en bewegingen staan
+onderaan bij `.gravure` in `css/style.css`.
 
 ## Bestanden
 

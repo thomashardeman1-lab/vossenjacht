@@ -151,7 +151,8 @@
 
   // Beelden en kleine tekeningen
   const LOGO = '<img class="logo" src="img/logo.png" alt="Foxhunt">';
-  const gravure = rol => `<div class="vak"><img class="gravure" src="img/${rol}.png" alt=""></div>`;
+  // gravure in twee lagen: het beeld en het bewegende stuk (kaak van de vos, geweer van de jager)
+  const gravure = rol => `<div class="vak gravure-vak"><div class="gravure ${rol}" role="img" aria-label="${rol === 'vos' ? 'De vos' : 'De jager'}"><img src="img/${rol}-basis.png" alt=""><img class="deel" src="img/${rol}-deel.png" alt=""></div></div>`;
   const logoVak = (klas = '') => `<div class="vak ${klas}">${LOGO}</div>`;
   const POOT = '<svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="27" rx="9" ry="8"/><ellipse cx="8" cy="16" rx="4" ry="5"/><ellipse cx="16" cy="9" rx="4" ry="5"/><ellipse cx="24" cy="9" rx="4" ry="5"/><ellipse cx="32" cy="16" rx="4" ry="5"/></svg>';
   const naamGroot = rol => (rol === 'vos' ? 'Vos' : 'Jager');
