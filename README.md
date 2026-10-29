@@ -62,12 +62,13 @@ transparante achtergrond, of SVG) onder dezelfde naam in de map `img/`.
 ## Bestanden
 
 ```
-index.html      het spel (met het bos als achtergrond)
+index.html      het spel
 duo.html        testpagina: beide schermen naast elkaar
 css/style.css   vormgeving
 js/data.js      ALLE inhoud: rollen, sporen, laatste spoor, prijs, geluiden
 js/geluid.js    alle geluidseffecten
 js/game.js      spellogica
+img/            logo en gravures
 ```
 
 Sporen toevoegen of aanpassen? Enkel `js/data.js` bewerken. Elk spoor heeft een
