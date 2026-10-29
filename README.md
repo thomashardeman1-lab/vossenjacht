@@ -52,8 +52,13 @@ Testen op één computer: `duo.html` toont beide schermen naast elkaar.
 Dezelfde stijl als de tickets: elke iPad heeft de kleur van zijn ticket.
 De Vos olijfgroen (`#4a4d39`) met crème (`#e1debc`), de Jager omgekeerd.
 Een geperforeerde rand, het FOXHUNT-logo (`img/logo.png`), de gravures
-(`img/vos.png`, `img/jager.png`), de letter IM Fell English en een volgnummer
-N°001 dat per iPad oploopt.
+(`img/vos.png`, `img/jager.png`), de jachthoorn (`img/hoorn.png`), de letter IM
+Fell English en een volgnummer N°001 dat per iPad oploopt.
+
+De opmaak schaalt mee met elk scherm (iPad staand of liggend, telefoon,
+groot scherm): alle maten hangen af van de kortste schermzijde en de beelden
+vullen de vrije ruimte zonder dat er iets van het scherm valt. Liggend staat
+het startscherm in twee kolommen.
 
 De beelden zijn nu uit kleine schermafbeeldingen geknipt en daardoor wat
 onscherp. Vervang ze door de originele bestanden (liefst PNG met een
@@ -68,7 +73,7 @@ css/style.css   vormgeving
 js/data.js      ALLE inhoud: rollen, sporen, laatste spoor, prijs, geluiden
 js/geluid.js    alle geluidseffecten
 js/game.js      spellogica
-img/            logo en gravures
+img/            logo, gravures en jachthoorn
 ```
 
 Sporen toevoegen of aanpassen? Enkel `js/data.js` bewerken. Elk spoor heeft een

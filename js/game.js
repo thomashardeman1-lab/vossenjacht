@@ -151,9 +151,9 @@
 
   // Beelden en kleine tekeningen
   const LOGO = '<img class="logo" src="img/logo.png" alt="Foxhunt">';
-  const gravure = rol => `<img class="gravure" src="img/${rol}.png" alt="">`;
+  const gravure = rol => `<div class="vak"><img class="gravure" src="img/${rol}.png" alt=""></div>`;
+  const logoVak = (klas = '') => `<div class="vak ${klas}">${LOGO}</div>`;
   const POOT = '<svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="27" rx="9" ry="8"/><ellipse cx="8" cy="16" rx="4" ry="5"/><ellipse cx="16" cy="9" rx="4" ry="5"/><ellipse cx="24" cy="9" rx="4" ry="5"/><ellipse cx="32" cy="16" rx="4" ry="5"/></svg>';
-  const HOORN = '<svg viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"><circle cx="55" cy="62" r="30"/><circle cx="55" cy="62" r="17"/><path d="M83 52C96 44 104 34 110 20M100 12L118 30M27 72C16 80 10 90 6 100"/></g></svg>';
   const naamGroot = rol => (rol === 'vos' ? 'Vos' : 'Jager');
 
   // Volgnummer zoals op de tickets (per iPad bijgehouden)
@@ -220,10 +220,13 @@
     else if (!S.klaar && S.partnerKlaar) status = `${tegen.naam} staat klaar. Jij ook?`;
     else status = S.partnerAanwezig ? `${tegen.naam} staat aan de overkant.` : 'Zoek je tegenspeler aan de overkant van de sokkel.';
 
-    return `<section class="scherm midden start">
-      <div class="badge-groot">${LOGO}</div>
-      <h1 class="rolnaam">${naamGroot(S.rol)}</h1>
-      ${gravure(S.rol)}
+    return `<section class="scherm start">
+      <div class="start-beeld">
+        <div class="badge-groot">${LOGO}</div>
+        <h1 class="rolnaam">${naamGroot(S.rol)}</h1>
+        ${gravure(S.rol)}
+      </div>
+      <div class="start-tekst">
       <p class="lead">${esc(r.intro)}</p>
       <ol class="regels">
         <li><span>I</span>Kijk over de sokkel naar de muur achter je tegenspeler.</li>
@@ -235,12 +238,13 @@
       <p class="status">${status}</p>
       <button class="link" data-act="solo">Alleen oefenen</button>
       ${nummer(volgnummer(false) + 1)}
+      </div>
     </section>`;
   }
 
   function schermHoorn() {
     return `<section class="scherm midden hoorn">
-      <div class="hoorn-icoon">${HOORN}</div>
+      <div class="vak hoorn-icoon"><span class="hoornbeeld" role="img" aria-label="Jachthoorn"></span></div>
       <h1 class="titel">De jacht begint</h1>
     </section>`;
   }
@@ -309,7 +313,7 @@
     const winnaar = D.rollen[S.einde];
     if (gewonnen) {
       return `<section class="scherm midden einde winst">
-        <div class="badge-groot">${LOGO}</div>
+        ${logoVak('penning')}
         <p class="ondertitel">${esc(winnaar.winst)}</p>
         <h1 class="titel">Jij wint de penning!</h1>
         <div class="opdracht"><strong>${esc(D.prijs.titel)}</strong><p>${esc(D.prijs.tekst)}</p></div>
