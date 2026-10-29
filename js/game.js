@@ -216,19 +216,13 @@
     </section>`;
   }
 
+  // Kort bevestigingsscherm na een juist antwoord; het spel gaat vanzelf verder.
   function schermGevonden() {
-    const q = S.vragen[S.i - 1];
-    const w = D.werken[q.werk];
     return `<section class="scherm gevonden">${kop()}${race()}
-      <main class="raster">
-        <figure class="werk">${w.iiif ? `<img src="${beeld(w.iiif, 1000)}" alt="${esc(w.titel)}">` : '<div class="leeg">beeld volgt</div>'}</figure>
-        <div class="tekst">
-          <div class="pil groen">Gevonden!</div>
-          <h2 class="werktitel">${esc(w.titel)}</h2>
-          <p class="maker">${esc(w.kunstenaar)}${w.inv ? ` · inv. ${esc(w.inv)}` : ''}</p>
-          <p class="weetje">${esc(q.weetje)}</p>
-          <button class="knop goud" data-act="verder">${S.i < S.vragen.length ? 'Volgend spoor' : 'Naar het laatste spoor'}</button>
-        </div>
+      <main class="midden">
+        <div class="vinkje">✓</div>
+        <h2 class="titel">Gevonden!</h2>
+        <p class="lead">${S.i < S.vragen.length ? `Spoor ${S.i} van ${S.vragen.length}` : 'Alle sporen gevonden'}</p>
       </main></section>`;
   }
 
@@ -288,6 +282,7 @@
     zend({ type: 'voortgang', rol: S.rol, n: S.i });
     S.scherm = 'gevonden';
     toon();
+    wacht(verder, 1300);
   }
 
   function fout(knop) {
