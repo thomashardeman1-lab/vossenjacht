@@ -4,39 +4,47 @@
  * Alle teksten en sporen staan hier. Pas dit bestand aan om sporen te
  * wijzigen; de spellogica (game.js) hoeft dan niet te veranderen.
  *
- * Opstelling: de spelers staan tegenover elkaar aan de sokkel. Elke speler
- * kijkt over de sokkel naar de muur achter de andere speler:
+ * Opstelling: de spelers staan tegenover elkaar aan de sokkel.
  *   De Vos   kijkt naar kant 3: links landschap met jachtbuit, midden stilleven
  *            met uil, rechts jachtbuit met pauw en everkop.
+ *            De grote muur (vossenjacht) ligt links, de onderste muur rechts.
  *   De Jager kijkt naar kant 1: links boeren op weg naar de markt, midden jong
  *            everzwijn met jachthond, rechts roerdomp en eenden met honden.
- * Het laatste spoor zit op de grote muur. De vossenjacht zelf wordt nooit
- * op het scherm getoond.
+ *            De grote muur ligt rechts, de onderste muur links.
+ *   De onderste muur (tegenover de vossenjacht), van links naar rechts:
+ *            Het doden van het hert · Samenkomst voor de jacht.
+ * De vossenjacht zelf wordt nooit op het scherm getoond.
  *
- * Een spoor: { tekst, antwoord: 'links' | 'midden' | 'rechts' }
- * Elk spel trekt willekeurig `aantalSporen` sporen per speler.
+ * Spoor op de muur voor je:   { tekst, antwoord: 'links' | 'midden' | 'rechts' }
+ * Spoor op de onderste muur:  { tekst, antwoord: 'links' | 'rechts' }
+ * Elk spel trekt willekeurig `aantalSporen` sporen per speler, waarvan
+ * `onderSporen` op de onderste muur.
  * Sporen met `nakijken: true` gaan over details die nog in de zaal moeten
  * worden bevestigd.
  */
 window.MSK = {
   aantalSporen: 5,
+  onderSporen: 1,
+  reeksVoorStreek: 3,   // zoveel juiste antwoorden op rij geven een streek
 
   rollen: {
     vos: {
       naam: 'De Vos', icoon: '🦊', kleur: '#f59e0b',
       muurNaam: 'kant 3',
-      focusKant: 'links',   // aan welke kant de grote muur ligt
+      focusKant: 'links',   // kant van de grote muur
+      onderKant: 'rechts',  // kant van de onderste muur
       intro: 'Je bent op de vlucht. Zoek eten en schuilplaatsen in de schilderijen achter de Jager, en wees sneller dan hij.',
       winst: 'De vos ontsnapt!',
-      streek: { naam: 'Mist', knop: 'Stuur mist naar de Jager', melding: 'De Vos hult je in mist!' }
+      streek: { knop: 'Stuur mist naar de Jager', melding: 'De Vos hult je in mist!' }
     },
     jager: {
       naam: 'De Jager', icoon: '🏹', kleur: '#34d399',
       muurNaam: 'kant 1',
       focusKant: 'rechts',
+      onderKant: 'links',
       intro: 'Je hond heeft iets geroken. Volg de sporen in de schilderijen achter de Vos en vang hem voor hij ontsnapt.',
       winst: 'De vos is gevangen!',
-      streek: { naam: 'Geblaf', knop: 'Laat de honden los op de Vos', melding: 'De honden van de Jager blaffen!' }
+      streek: { knop: 'Laat de honden los op de Vos', melding: 'De honden van de Jager blaffen!' }
     }
   },
 
@@ -64,6 +72,23 @@ window.MSK = {
       { tekst: 'Waar zie je de meeste mensen?', antwoord: 'links' },
       { tekst: 'Waar zit iemand op weg naar de markt?', antwoord: 'links' },
       { tekst: 'Waar zie je enkel dieren en geen enkele mens?', antwoord: 'midden', nakijken: true }
+    ]
+  },
+
+  // Sporen op de onderste muur, tegenover de vossenjacht.
+  // links = Het doden van het hert, rechts = Samenkomst voor de jacht
+  onder: {
+    vos: [
+      { tekst: 'Een hert is in het water gesprongen om aan de honden te ontsnappen. Waar?', antwoord: 'links' },
+      { tekst: 'Waar springt een ruiter over een brug?', antwoord: 'links', nakijken: true },
+      { tekst: 'Waar rijdt een dame in een rode jurk op een wit paard?', antwoord: 'rechts' },
+      { tekst: 'Waar staan dikke stenen zuilen? Daarachter kan jij je verstoppen.', antwoord: 'rechts' }
+    ],
+    jager: [
+      { tekst: 'Waar heeft de meute het hert al te pakken?', antwoord: 'links' },
+      { tekst: 'Waar verzamelt het gezelschap zich voor de jacht begint?', antwoord: 'rechts' },
+      { tekst: 'Waar staat een grote stenen vaas op een sokkel?', antwoord: 'rechts' },
+      { tekst: 'Waar stroomt er water?', antwoord: 'links' }
     ]
   },
 

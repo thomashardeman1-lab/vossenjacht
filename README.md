@@ -20,22 +20,32 @@ Testen op één computer: `duo.html` toont beide schermen naast elkaar.
 
 ## Spelverloop
 
-1. **Start:** een nachtelijk bos met maan, mist en vuurvliegjes; wind en een uil op de achtergrond.
-2. Beide spelers tikken op **Ik ben klaar**: de jachthoorn klinkt, daarna 3-2-1.
-3. **5 sporen:** korte opdrachtjes in de stem van je rol ("Je maag knort… Waar
-   hangt een dode haas in een boom?"). Je antwoordt met **← Links, ↑ Midden,
-   → Rechts**: waar hangt het op de muur? Elke speler krijgt willekeurig 5
-   sporen uit een tiental, dus elk spel is anders.
-4. **Fout:** een kraai krast en je wacht 3 tellen.
-5. **Juist:** pootstapjes en een belletje; je pootafdrukken lopen verder bovenaan.
-6. **Streken:** na het 2de en 4de spoor lever je je tegenspeler een streek:
-   - de Vos stuurt **mist**: het scherm van de Jager wordt 3 seconden wazig;
-   - de Jager laat de **honden blaffen**: het scherm van de Vos schudt.
-7. Is je tegenspeler bijna klaar, dan hoor je een hartslag.
+1. **Start:** een nachtelijk bos met maan, mist en vuurvliegjes; wind, krekels,
+   krakende takjes en een uil op de achtergrond.
+2. Tikt de Vos op **Ik ben klaar**, dan keft er een vos; bij de Jager huilt een
+   jachthond. Zijn beiden klaar, dan blaast de trompet de jacht in, gevolgd
+   door drie tromslagen.
+3. **5 sporen:** korte opdrachtjes in de stem van je rol. Je antwoordt waar het
+   hangt:
+   - op de muur achter je tegenspeler: **← Links, ↑ Midden, → Rechts**;
+   - op de **onderste muur** (tegenover de vossenjacht): **← Links** (Het doden
+     van het hert) of **→ Rechts** (Samenkomst voor de jacht). Een gele balk
+     zegt naar welke kant je je moet draaien. Elk spel bevat minstens één
+     spoor op deze muur.
+   Elke speler krijgt willekeurig sporen uit een ruime lijst, dus elk spel is anders.
+4. **Voortgang:** de Vos laat pootafdrukken achter, de Jager bolletjes.
+5. **Juist:** een belletje, met ritselende pootjes (Vos) of paardenhoeven (Jager).
+   **Fout:** een kraai krast, je reeks valt terug op nul en je wacht 3 tellen.
+6. **Streken:** wie **3 keer juist op rij** antwoordt (instelbaar bij
+   `reeksVoorStreek`), mag een streek uithalen. De Vos stuurt **mist** (het
+   scherm van de Jager wordt wazig), de Jager laat de **honden** los (het
+   scherm van de Vos schudt). De reeksmeter bovenaan toont hoe ver je staat.
+7. Vindt je tegenspeler een spoor, dan hoor je geritsel in de verte. Is hij
+   bijna klaar, dan begint een hartslag.
 8. **Laatste spoor:** draai je om naar de grote muur. Hangt het medaillon boven of onder de stier?
-9. **Winnaar:** hallali op de hoorn, gouden vonken, en de opdracht om de
+9. **Winnaar:** hallali op de trompet, gouden vonken en de opdracht om de
    NFC-penning tegen de lezer aan de grote muur te houden. **Verliezer:** een
-   droevige hoorn.
+   droevige trompet.
 
 ## Bestanden
 
@@ -53,24 +63,29 @@ tekst en een antwoord (`links`, `midden` of `rechts`).
 
 ## Geluid
 
-Alle geluiden worden in de browser nagemaakt: jachthoorn, hallali, droevige
-hoorn, belletje, pootstapjes, kraai, geblaf, mist, wind, uil, hartslag en tikken
-bij het aftellen. Echte opnames klinken beter: zet mp3-bestanden in een map
-`audio/` en vul de paden in bij `geluiden` in `js/data.js`, bv.
-`hoorn: 'audio/hoorn.mp3'`. Vrije opnames vind je op Freesound of Wikimedia
-Commons.
+Alle geluiden worden in de browser nagemaakt (`js/geluid.js`):
+trompet (fanfare, startsignaal, hallali, droevige toon), tromslagen, belletje,
+oplopend arpeggio bij een volle reeks, pootjes, paardenhoeven, kraai, geblaf,
+huilende jachthond, kevende vos, mist, zwiep bij het omdraaien, geritsel in de
+verte, hartslag, wind, krekels, takjes, een uil en een tikje bij elke knop.
 
-Een iPad speelt pas geluid na een eerste aanraking; de wind en de uil beginnen
-dus pas wanneer iemand het scherm aanraakt.
+De trompet is een natuurtrompet in Bes: enkel de natuurtonen, met een
+koperklank die helderder wordt bij elke aanzet, ademruis en vibrato.
+Echte opnames klinken nog beter: zet mp3-bestanden in een map `audio/` en vul
+de paden in bij `geluiden` in `js/data.js`, bv. `hoorn: 'audio/hoorn.mp3'`.
+
+Een iPad speelt pas geluid na een eerste aanraking; de achtergrondgeluiden
+beginnen dus pas wanneer iemand het scherm aanraakt.
 
 ## Na te kijken in de zaal
 
-Sommige sporen gaan over details die ik uit beschrijvingen en foto's haalde.
+Sommige sporen gaan over details die uit beschrijvingen en foto's komen.
 Kijk die na aan de echte schilderijen (in `data.js` staan ze met `nakijken: true`):
 
 - De Vos: zie je bergen in de verte in het landschap (links)?
 - De Vos: ligt er een bijl bij de pauw en de everkop (rechts)?
 - De Jager: zijn er in het everzwijn-schilderij (midden) echt geen mensen?
+- Onderste muur: springt er een ruiter over een brug in Het doden van het hert?
 - Het laatste spoor: hangt het medaillon boven de stier?
 - Kloppen links, midden en rechts voor elk schilderij, gezien vanaf de sokkel?
 

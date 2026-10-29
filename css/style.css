@@ -103,15 +103,28 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ---------- kop met pootjes ---------- */
 .kop { position: relative; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 14px 32px; border-bottom: 1px solid var(--lijn); background: #0e1611; }
 .spoor { display: flex; flex-direction: column; gap: 6px; }
-.pootrij { display: flex; align-items: center; gap: 12px; }
-.pootrij .wie { width: 40px; font-size: 28px; }
-.pootrij i { font-style: normal; font-size: 30px; filter: grayscale(1) brightness(1.6); opacity: .25; transition: opacity .4s, filter .4s; }
-.pootrij i:nth-of-type(even) { transform: translateY(-3px) rotate(-12deg); }
-.pootrij i:nth-of-type(odd) { transform: translateY(3px) rotate(12deg); }
-.pootrij i.gezet { filter: none; opacity: 1; }
-.pootrij i.laatste { color: var(--goud-licht); font-size: 34px; filter: none; opacity: .35; }
-.pootrij i.laatste.gezet { opacity: 1; }
-.pootrij:not(.eigen) { transform: scale(.75); transform-origin: left; opacity: .8; margin-top: -4px; }
+.voortgang { display: flex; align-items: center; gap: 12px; }
+.voortgang .wie { width: 40px; font-size: 28px; }
+.voortgang i { font-style: normal; transition: opacity .4s, filter .4s, background .4s, transform .4s; }
+.voortgang i.laatste { color: var(--goud-licht); font-size: 34px; opacity: .35; }
+.voortgang i.laatste.gezet { opacity: 1; }
+/* de vos: pootafdrukken */
+.voortgang .poot { font-size: 30px; filter: grayscale(1) brightness(1.6); opacity: .25; }
+.voortgang .poot:nth-of-type(even) { transform: translateY(-3px) rotate(-12deg); }
+.voortgang .poot:nth-of-type(odd) { transform: translateY(3px) rotate(12deg); }
+.voortgang .poot.gezet { filter: none; opacity: 1; }
+/* de jager: bolletjes */
+.voortgang .bol { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--k); opacity: .35; margin: 0 4px; }
+.voortgang .bol.gezet { background: var(--k); opacity: 1; box-shadow: 0 0 10px var(--k); transform: scale(1.05); }
+.voortgang:not(.eigen) { transform: scale(.75); transform-origin: left; opacity: .8; margin-top: -4px; }
+
+/* reeksmeter: juiste antwoorden op rij */
+.kop-rechts { display: flex; align-items: center; gap: 18px; }
+.reeks { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--lijn); border-radius: 999px; background: rgba(12, 18, 14, .6); }
+.reeks i { width: 14px; height: 14px; border-radius: 50%; background: rgba(255, 255, 255, .12); transition: background .3s, box-shadow .3s; }
+.reeks i.aan { background: #f97316; box-shadow: 0 0 10px #f97316; }
+.reeks span { font-size: 20px; opacity: .35; margin-left: 4px; }
+.reeks.vol span { opacity: 1; animation: adem .8s ease-in-out infinite; }
 
 /* ---------- vraag ---------- */
 .blad { flex: 1; display: flex; flex-direction: column; padding: 28px 48px 36px; min-height: 0; }
@@ -134,6 +147,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .kop { padding: 12px 16px; } .blad { padding: 20px; }
 }
 
+/* spoor op de onderste muur: eerst omdraaien */
+.draaiwijzer { align-self: flex-start; margin: 0 0 14px; padding: 10px 20px; border-radius: 999px; background: var(--goud); color: #1a1206; font-weight: 700; font-size: 20px; animation: lok 1s ease-in-out infinite; }
+.draaiwijzer.rechts { align-self: flex-end; }
+.onder .plaats { border-style: dashed; }
+.vuur { color: #f97316; font-size: 16px; }
+
 /* fout: rode flits */
 .straf { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(60, 10, 8, .82); opacity: 0; pointer-events: none; transition: opacity .15s; text-align: center; z-index: 10; }
 .straf.aan { opacity: 1; pointer-events: all; }
@@ -146,6 +165,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @keyframes krimp { to { transform: scaleX(0); } }
 
 /* ---------- gevonden ---------- */
+.vinkje.jager { color: #34d399; font-size: 70px; }
 .vinkje { width: 130px; height: 130px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 18px; font-size: 64px;
   background: rgba(52, 211, 153, .12); border: 2px solid #34d399; animation: vink .5s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes vink { from { transform: scale(.3) rotate(-30deg); opacity: 0; } }
