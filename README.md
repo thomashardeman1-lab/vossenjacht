@@ -64,8 +64,9 @@ De gravures hebben een zachte rand en bewegen: de vos hapt twee keer met zijn
 bek, de jager tilt zijn geweer van zijn schouder en legt het terug. Elke
 gravure bestaat daarvoor uit twee lagen: `img/vos-basis.png` en
 `img/vos-deel.png` (de onderkaak), `img/jager-basis.png` en
-`img/jager-deel.png` (het geweer). De draaipunten en bewegingen staan
-onderaan bij `.gravure` in `css/style.css`.
+`img/jager-deel.png` (het geweer). De gravure is een SVG met ingebouwde animatie (SMIL),
+zodat ze ook op oudere iPads beweegt. Draaipunt, hoek en tempo staan bij
+`GRAVURE` in `js/game.js`.
 
 ## Bestanden
 

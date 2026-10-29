@@ -151,8 +151,39 @@
 
   // Beelden en kleine tekeningen
   const LOGO = '<img class="logo" src="img/logo.png" alt="Foxhunt">';
-  // gravure in twee lagen: het beeld en het bewegende stuk (kaak van de vos, geweer van de jager)
-  const gravure = rol => `<div class="vak gravure-vak"><div class="gravure ${rol}" role="img" aria-label="${rol === 'vos' ? 'De vos' : 'De jager'}"><img src="img/${rol}-basis.png" alt=""><img class="deel" src="img/${rol}-deel.png" alt=""></div></div>`;
+  // Gravure als SVG in twee lagen: het beeld en het bewegende stuk (kaak van de
+  // vos, geweer van de jager). SVG schaalt vanzelf mee in zijn vak en de
+  // animatie (SMIL) en de zachte rand (SVG-masker) werken in elke Safari.
+  const GRAVURE = {
+    vos: { b: 1800, h: 1243, as: '1215 425', duur: 3.2,
+      // twee keer happen en dan wachten
+      draai: '0;0;-18;0;-18;0;0', tijden: '0;.08;.16;.24;.32;.42;1',
+      adem: '0 0;0 -8;0 0', ademDuur: 3.2 },
+    jager: { b: 1800, h: 1019, as: '320 215', duur: 5,
+      // geweer van de schouder tillen, even houden en terugleggen
+      draai: '0;0;-9;-9;0;0', tijden: '0;.15;.35;.6;.8;1',
+      adem: '0 0;0 -5;0 0', ademDuur: 5 }
+  };
+  let gravureNr = 0;
+  const gravure = (rol, stil = false) => {
+    const g = GRAVURE[rol], id = 'gr' + (++gravureNr);
+    const anim = (type, values, keyTimes, dur) => stil ? '' :
+      `<animateTransform attributeName="transform" type="${type}" values="${values}"${keyTimes ? ` keyTimes="${keyTimes}"` : ''} dur="${dur}s" repeatCount="indefinite" calcMode="spline" keySplines="${Array(values.split(';').length - 1).fill('.45 0 .55 1').join(';')}"/>`;
+    const draaiwaarden = g.draai.split(';').map(a => `${a} ${g.as}`).join(';');
+    const beeld = n => `<image href="img/${rol}-${n}.png" xlink:href="img/${rol}-${n}.png" width="${g.b}" height="${g.h}"/>`;
+    return `<div class="vak"><svg class="gravure ${rol}${stil ? ' stil' : ''}" viewBox="0 0 ${g.b} ${g.h}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${rol === 'vos' ? 'De vos' : 'De jager'}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <defs>
+        <linearGradient id="${id}x"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".12" stop-color="#fff"/><stop offset=".88" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="${id}y" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".1" stop-color="#fff"/><stop offset=".9" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <mask id="${id}mx" maskUnits="userSpaceOnUse" x="0" y="0" width="${g.b}" height="${g.h}"><rect width="${g.b}" height="${g.h}" fill="url(#${id}x)"/></mask>
+        <mask id="${id}my" maskUnits="userSpaceOnUse" x="0" y="0" width="${g.b}" height="${g.h}"><rect width="${g.b}" height="${g.h}" fill="url(#${id}y)"/></mask>
+      </defs>
+      <g mask="url(#${id}mx)"><g mask="url(#${id}my)"><g>${anim('translate', g.adem, '', g.ademDuur)}
+        ${beeld('basis')}
+        <g>${anim('rotate', draaiwaarden, g.tijden, g.duur)}${beeld('deel')}</g>
+      </g></g></g>
+    </svg></div>`;
+  };
   const logoVak = (klas = '') => `<div class="vak ${klas}">${LOGO}</div>`;
   const POOT = '<svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="27" rx="9" ry="8"/><ellipse cx="8" cy="16" rx="4" ry="5"/><ellipse cx="16" cy="9" rx="4" ry="5"/><ellipse cx="24" cy="9" rx="4" ry="5"/><ellipse cx="32" cy="16" rx="4" ry="5"/></svg>';
   const naamGroot = rol => (rol === 'vos' ? 'Vos' : 'Jager');
@@ -323,7 +354,7 @@
       </section>`;
     }
     return `<section class="scherm midden einde verlies">
-      ${gravure(S.rol)}
+      ${gravure(S.rol, true)}
       <p class="ondertitel">${esc(winnaar.winst)}</p>
       <h1 class="titel">Net niet…</h1>
       <p class="lead">${winnaar.naam} was je te snel af en gaat met de penning lopen.</p>
