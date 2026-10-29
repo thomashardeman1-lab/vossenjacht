@@ -232,3 +232,19 @@ img.kapot { visibility: hidden; }
   background: rgba(52, 211, 153, .15); border: 2px solid #34d399; color: #7ee2b8; font-size: 64px;
   animation: vink .5s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes vink { from { transform: scale(.3); opacity: 0; } }
+
+/* drie grote knoppen: links, midden, rechts */
+.muurknoppen { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; min-height: 200px; margin-top: 8px; }
+.plaats {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: var(--bg2); border: 2px solid var(--goud); border-radius: 22px;
+  font-family: var(--serif); font-size: clamp(30px, 4vw, 48px); color: var(--goud-licht);
+  transition: transform .1s, background .15s;
+}
+.plaats:active { transform: scale(.97); background: #1c2a22; }
+.plaats .pijltje { font-family: var(--sans); font-size: clamp(40px, 6vw, 72px); line-height: 1; }
+@media (max-width: 600px) {
+  .muurknoppen { grid-template-columns: 1fr; gap: 12px; }
+  .plaats { flex-direction: row; gap: 16px; border-radius: 16px; font-size: 30px; }
+  .plaats .pijltje { font-size: 36px; }
+}

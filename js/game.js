@@ -184,19 +184,16 @@
     return S.i < S.vragen.length ? S.vragen[S.i] : D.finale;
   }
 
-  function muurSchets(q) {
+  // Drie grote knoppen: links, midden en rechts op de muur achter je tegenspeler.
+  function muurSchets() {
     const r = D.rollen[S.rol];
-    // Lijsten op schaal: breedte in verhouding tot de echte breedtes, hoogte via aspect-ratio.
-    const som = r.muur.reduce((t, k) => t + (D.werken[k].b || 100), 0);
-    const lijsten = r.muur.map((k, n) => {
-      const w = D.werken[k];
-      const breedte = ((w.b || 100) / som) * 78;
-      return `<button class="lijst" data-act="muur" data-werk="${k}" style="--w:${breedte}%;--r:${w.b || 100}/${w.h || 100}">
-        <span class="nr">${n + 1}</span></button>`;
-    }).join('');
-    const pijl = `<div class="focus ${r.focusKant}">${r.focusKant === 'links' ? '←' : ''} bovenmuur ${r.focusKant === 'rechts' ? '→' : ''}</div>`;
-    return `<div class="muur">${pijl}<div class="wand">${lijsten}</div><div class="plint"></div>
-      <p class="hint">Dit is de muur achter je tegenspeler (${r.muurNaam}). Tik op het juiste schilderij.</p></div>`;
+    const plaatsen = ['Links', 'Midden', 'Rechts'];
+    const pijlen = ['←', '↑', '→'];
+    return `<div class="muurknoppen">
+      ${r.muur.map((k, n) => `<button class="plaats" data-act="muur" data-werk="${k}">
+        <span class="pijltje">${pijlen[n]}</span><span>${plaatsen[n]}</span></button>`).join('')}
+    </div>
+    <p class="hint">Welk schilderij op de muur achter je tegenspeler?</p>`;
   }
 
   function schermVraag() {
